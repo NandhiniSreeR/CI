@@ -1,5 +1,7 @@
 package com.tw.bootcamp.bookshop.user.address;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tw.bootcamp.bookshop.order.Order;
 import com.tw.bootcamp.bookshop.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +9,7 @@ import lombok.Getter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -29,8 +32,12 @@ public class Address {
     private String country;
     private boolean isDefault;
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    @OneToMany(mappedBy="address")
+    @JsonIgnore
+    private List<Order> order;
 
     public Address() {
         this.isDefault = false;
