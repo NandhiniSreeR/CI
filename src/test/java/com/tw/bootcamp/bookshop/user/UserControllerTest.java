@@ -59,7 +59,7 @@ class UserControllerTest {
         mockMvc.perform(post("/users")
                 .content(objectMapper.writeValueAsString(userCredentials))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("User with same email already created"));
     }
 
@@ -72,7 +72,7 @@ class UserControllerTest {
         mockMvc.perform(post("/users")
                 .content(objectMapper.writeValueAsString(userCredentials))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("Validation failed"))
                 .andExpect(jsonPath("$.errors.email").value("Email is mandatory"));
     }

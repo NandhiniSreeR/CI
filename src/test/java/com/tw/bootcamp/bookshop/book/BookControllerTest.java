@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,4 +55,50 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.length()").value(0));
         verify(bookService, times(1)).fetchAll();
     }
+
+    @Test
+    void shouldSaveBookDetailsWhenUploadNonEmptyCSV() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book - Correct Format.csv");
+        MockMultipartFile file = new MockMultipartFile("file", "Book - Correct Format.csv", "text/csv", uploadStream);
+        assert uploadStream != null;
+
+        this.mockMvc.perform(multipart("/load-books")
+                        .file(file))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    void shouldGiveErrorMessageWhenUploadEmptyFile() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("");
+        MockMultipartFile file = new MockMultipartFile("file", uploadStream);
+        assert uploadStream != null;
+
+        this.mockMvc.perform(multipart("/load-books")
+                        .file(file))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldGiveErrorMessageWhenUploadNonCSVFile() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book - Non CSV.txt");
+        MockMultipartFile file = new MockMultipartFile("file", "Book - Non CSV.txt", "text/plain", uploadStream);
+        assert uploadStream != null;
+
+        this.mockMvc.perform(multipart("/load-books")
+                        .file(file))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldNotUploadCSVWhenHeaderFormatIsIncorrect() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book - Incorrect Headers.csv");
+        MockMultipartFile file = new MockMultipartFile("file", "Book - Incorrect Headers.csv", "text/csv", uploadStream);
+        when(bookService.loadBooks(any(InputStream.class))).thenThrow(new BookFormatException("Book error"));
+
+        this.mockMvc.perform(multipart("/load-books")
+                        .file(file))
+                .andExpect(status().isBadRequest());
+    }
+
 }

@@ -22,6 +22,6 @@ public class Money {
     private double amount;
 
     public static Money rupees(double amount) {
-        return new Money("INR", amount);
+        return new Money(Country.INDIA.currency, amount);
     }
 }
