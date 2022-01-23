@@ -1,10 +1,9 @@
-alter table books
-    add column image_url varchar(255),
-    add column small_image_url varchar(255),
-    add column books_count numeric,
-    add column isbn13 varchar(255),
-    add column isbn varchar(255),
-    add column original_publication_year varchar(255),
-    add column original_title varchar(255),
-    add column language_code varchar(255),
-    add column average_rating varchar(255);
+alter table books add column image_url varchar;
+alter table books add column small_image_url varchar;
+alter table books add column books_count numeric;
+alter table books add column isbn13 varchar;
+alter table books add column isbn varchar;
+alter table books add column original_publication_year varchar;
+alter table books add column original_title varchar;
+alter table books add column language_code varchar;
+alter table books add column average_rating varchar;
