@@ -1,13 +1,11 @@
 package com.tw.bootcamp.bookshop.book;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.opencsv.bean.CsvBindByName;
 import com.tw.bootcamp.bookshop.money.Money;
-import com.tw.bootcamp.bookshop.order.Order;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
+import javax.validation.constraints.NotBlank;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,8 +18,10 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
     @CsvBindByName(column = "title")
     private String name;
+    @NotBlank
     @CsvBindByName(column = "author")
     private String authorName;
 //    @Embedded
@@ -31,27 +31,24 @@ public class Book {
     private double amount;
     private String currency;
     @CsvBindByName(column = "image_url")
-    private String image_url;
+    private String imageUrl;
     @CsvBindByName(column = "small_image_url")
-    private String small_image_url;
+    private String smallImageUrl;
     @Column(columnDefinition = "NUMERIC")
     @CsvBindByName(column = "books_count")
-    private Integer books_count;
+    private Integer booksCount;
     @CsvBindByName(column = "isbn13")
     private String isbn13;
     @CsvBindByName(column = "isbn")
     private String isbn;
     @CsvBindByName(column = "original_publication_year")
-    private String original_publication_year;
+    private String originalPublicationYear;
     @CsvBindByName(column = "original_title")
-    private String original_title;
+    private String originalTitle;
     @CsvBindByName(column = "language_code")
-    private String language_code;
+    private String languageCode;
     @CsvBindByName(column = "average_rating")
-    private String average_rating;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "book")
-    @JsonIgnore
-    private List<Order> order;
+    private String averageRating;
 
     public BookResponse toResponse() {
         return BookResponse.builder()
@@ -59,15 +56,15 @@ public class Book {
                 .name(name)
                 .authorName(authorName)
                 .price(new Money("INR", amount))
-                .image_url(image_url)
-                .small_image_url(small_image_url)
-                .books_count(books_count)
+                .image_url(imageUrl)
+                .small_image_url(smallImageUrl)
+                .books_count(booksCount)
                 .isbn13(isbn13)
                 .isbn(isbn)
-                .original_publication_year(original_publication_year)
-                .original_title(original_title)
-                .language_code(language_code)
-                .average_rating(average_rating)
+                .original_publication_year(originalPublicationYear)
+                .original_title(originalTitle)
+                .language_code(languageCode)
+                .average_rating(averageRating)
                 .build();
     }
 }

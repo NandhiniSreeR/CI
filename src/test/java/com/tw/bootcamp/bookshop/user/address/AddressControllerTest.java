@@ -65,7 +65,7 @@ class AddressControllerTest {
         mockMvc.perform(post("/addresses")
                 .content(objectMapper.writeValueAsString(createRequest))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("Validation failed"));
 
         verify(addressService, times(1)).create(any(), any());
