@@ -2,6 +2,9 @@ plugins {
 	id 'org.springframework.boot' version '2.3.2.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
+	id 'jacoco'
+	id "org.sonarqube" version "3.3"
+	id 'com.avast.gradle.docker-compose' version '0.14.3'
 }
 
 group = 'com.tw.bootcamp'
@@ -21,6 +24,8 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.opencsv:opencsv:5.5.2'
+	implementation "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3"
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation 'org.flywaydb:flyway-core'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -34,8 +39,27 @@ dependencies {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	testImplementation 'org.springframework.security:spring-security-test'
-	implementation 'org.springdoc:springdoc-openapi-ui:1.5.11'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.3'
 }
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
+	}
+}
+
+sonarqube {
+	properties {
+		property 'sonar.host.url', 'http://localhost:9000'
+	}
+}
+
+test.finalizedBy jacocoTestReport
+tasks.named('sonarqube').configure {
+	dependsOn test
+}
+
+apply plugin: "org.sonarqube"
 
 test {
 	systemProperty 'spring.profiles.active', 'test'
