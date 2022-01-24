@@ -11,12 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/addresses")
@@ -37,5 +36,16 @@ public class AddressController {
         Address address = addressService.create(createRequest, user);
         AddressResponse addressResponse = address.toResponse();
         return new ResponseEntity<>(addressResponse, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{user-email}")
+    @Operation(summary = "Get addresses by user email", description = "Returns addresses by user email", tags = {"Address Service"})
+    @ApiResponses(value = {@ApiResponse(responseCode = "200",
+            description = "Addresses returned", content = {@Content(mediaType = "application/json",
+            schema = @Schema(implementation = ResponseEntity.class))})}
+    )
+    public ResponseEntity<List<Address>> findByUserEmail(@PathVariable("user-email") String userEmail) {
+        List<Address> addresses = new ArrayList<>();
+        return new ResponseEntity<>(addresses, HttpStatus.OK);
     }
 }

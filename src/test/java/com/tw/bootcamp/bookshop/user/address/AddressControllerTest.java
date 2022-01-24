@@ -14,10 +14,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import javax.validation.ConstraintViolationException;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -69,6 +72,20 @@ class AddressControllerTest {
                 .andExpect(jsonPath("$.message").value("Validation failed"));
 
         verify(addressService, times(1)).create(any(), any());
+    }
+
+    @Test
+    void shouldReturnAddressesByUserEmail() throws Exception {
+        String userEmail = "testemail@test.com";
+        User user = new UserTestBuilder().build();
+        when(userService.findByEmail(userEmail)).thenReturn(Optional.of(user));
+
+        Address address = new AddressTestBuilder().build();
+        List<Address> addresses = Collections.singletonList(address);
+        when(addressService.loadAddressFromUserName(user)).thenReturn(addresses);
+
+        mockMvc.perform(get("/addresses/" + userEmail))
+                .andExpect(status().isOk());
     }
 
     private CreateAddressRequest createAddress() {
