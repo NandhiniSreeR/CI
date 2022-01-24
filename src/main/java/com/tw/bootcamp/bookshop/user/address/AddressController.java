@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -45,7 +44,8 @@ public class AddressController {
             schema = @Schema(implementation = ResponseEntity.class))})}
     )
     public ResponseEntity<List<Address>> findByUserEmail(@PathVariable("user-email") String userEmail) {
-        List<Address> addresses = new ArrayList<>();
+        User user = userService.findByEmail(userEmail).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        List<Address> addresses = addressService.loadAddressFromUserName(user);
         return new ResponseEntity<>(addresses, HttpStatus.OK);
     }
 }

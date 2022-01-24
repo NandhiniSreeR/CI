@@ -75,7 +75,7 @@ class AddressControllerTest {
     }
 
     @Test
-    void shouldReturnAddressesByUserEmail() throws Exception {
+    void shouldReturnAddressesForUserWhenEmailExists() throws Exception {
         String userEmail = "testemail@test.com";
         User user = new UserTestBuilder().build();
         when(userService.findByEmail(userEmail)).thenReturn(Optional.of(user));
@@ -85,7 +85,10 @@ class AddressControllerTest {
         when(addressService.loadAddressFromUserName(user)).thenReturn(addresses);
 
         mockMvc.perform(get("/addresses/" + userEmail))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0]").exists())
+                .andExpect(jsonPath("$[0].city").value(address.getCity()));
     }
 
     private CreateAddressRequest createAddress() {
