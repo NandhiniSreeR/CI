@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -34,5 +35,18 @@ public class BookController {
         return books.stream()
                 .map(book -> book.toResponse())
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/book/{id}")
+    @Operation(summary = "Show book details", description = "Show details of a book in bookshop", tags = {"Books Service"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Show book details",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BookResponse.class))}),
+            @ApiResponse(responseCode = "404", content = @Content)
+    })
+    BookResponse fetch(@PathVariable Long id) throws BookNotFoundException {
+        Book book = bookService.fetchByBookId(id);
+        return book.toResponse();
     }
 }

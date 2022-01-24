@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService {
@@ -16,5 +17,10 @@ public class BookService {
 
     public List<Book> fetchAll() {
         return bookRepository.findAllByOrderByNameAsc();
+    }
+
+    public Book fetchByBookId(Long id) throws BookNotFoundException {
+        Optional<Book> book = bookRepository.findById(id);
+        return book.orElseThrow(BookNotFoundException::new);
     }
 }

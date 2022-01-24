@@ -53,4 +53,17 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.length()").value(0));
         verify(bookService, times(1)).fetchAll();
     }
+
+    @Test
+    void shouldReturnBookDetailsWhenBookIdIsValid() throws Exception {
+        Book book = new BookTestBuilder().withId(56L).build();
+
+        when(bookService.fetchByBookId(56L)).thenReturn(book);
+
+        mockMvc.perform(get("/book/56")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Harry Potter"));
+        verify(bookService, times(1)).fetchByBookId(56L);
+    }
 }
