@@ -4,7 +4,7 @@ RUN addgroup -S spring && adduser -S springuser -G spring
 USER springuser
 WORKDIR /home/springuser
 
-ARG JAR_FILE=build/libs/batch19-cicd-demo-0.0.1-SNAPSHOT.jar
+ARG JAR_FILE=build/libs/bookshop-0.0.1-SNAPSHOT.jar
 
 COPY ${JAR_FILE} app.jar
 
