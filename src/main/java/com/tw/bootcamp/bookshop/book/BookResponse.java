@@ -13,13 +13,4 @@ public class BookResponse {
     private String name;
     private String authorName;
     private Money price;
-    private String image_url;
-    private String small_image_url;
-    private Integer books_count;
-    private String isbn13;
-    private String isbn;
-    private String original_publication_year;
-    private String original_title;
-    private String language_code;
-    private String average_rating;
 }

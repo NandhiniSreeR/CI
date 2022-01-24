@@ -1,7 +1,5 @@
 package com.tw.bootcamp.bookshop.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.tw.bootcamp.bookshop.order.Order;
 import com.tw.bootcamp.bookshop.user.address.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,16 +27,11 @@ public class User {
     @NotBlank(message = "Email is mandatory")
     private String email;
     @NotBlank(message = "Password is mandatory")
-    @JsonIgnore
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
     @OneToMany(mappedBy = "user")
-    @JsonIgnore
     private List<Address> addresses;
-    @OneToMany(mappedBy="user")
-    @JsonIgnore
-    private List<Order> order;
 
     private User(String email, String password, Role role) {
         this.email = email;
