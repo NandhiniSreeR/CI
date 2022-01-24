@@ -91,6 +91,18 @@ class AddressControllerTest {
                 .andExpect(jsonPath("$[0].city").value(address.getCity()));
     }
 
+    @Test
+    void shouldFailToReturnAddressesForUserWhenEmailDoesNotExist() throws Exception{
+        String invalidEmail = "test@test.com";
+        when(userService.findByEmail(invalidEmail)).thenReturn(Optional.empty());
+        List<Address> addresses = Collections.singletonList(new AddressTestBuilder().build());
+        when(addressService.loadAddressFromUserName(any(User.class))).thenReturn(addresses);
+
+        mockMvc.perform(get("/addresses/" + invalidEmail))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.message").value("User email does not exist"));
+    }
+
     private CreateAddressRequest createAddress() {
         return CreateAddressRequest.builder()
                 .lineNoOne("4 Privet Drive")
