@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Service
 public class AddressService {
@@ -14,5 +15,9 @@ public class AddressService {
     public Address create(@Valid CreateAddressRequest createRequest, User user) {
         Address address = Address.create(createRequest, user);
         return addressRepository.save(address);
+    }
+
+    public List<Address> loadAddressFromUserName(User user) {
+        return addressRepository.findAllByUser(user);
     }
 }
