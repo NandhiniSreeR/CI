@@ -45,4 +45,15 @@ class BookServiceTest {
         assertEquals(2, books.size());
         assertEquals("Animal Farm", books.get(0).getName());
     }
+
+    @Test
+    void shouldReturnBookDetailsWhenBookIdIsValid() throws BookNotFoundException {
+        String bookName = "Eclipse (Twilight, #3)";
+        Book book = new BookTestBuilder().withName(bookName).build();
+        book = bookRepository.save(book);
+
+        Book bookDetails = bookService.fetchByBookId(book.getId());
+
+        assertEquals(bookName, bookDetails.getName());
+    }
 }
