@@ -101,15 +101,16 @@ class BookControllerTest {
 
     @Test
     void shouldReturnBookDetailsWhenBookIdIsValid() throws Exception {
-        Book book = new BookTestBuilder().withId(56L).build();
+        long BOOK_ID = 56L;
+        Book book = new BookTestBuilder().withId(BOOK_ID).build();
 
-        when(bookService.fetchByBookId(56L)).thenReturn(book);
+        when(bookService.fetchByBookId(BOOK_ID)).thenReturn(book);
 
         mockMvc.perform(get("/book/56")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Harry Potter"));
-        verify(bookService, times(1)).fetchByBookId(56L);
+        verify(bookService, times(1)).fetchByBookId(BOOK_ID);
     }
 
     @Test

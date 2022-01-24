@@ -52,6 +52,17 @@ class BookServiceTest {
     }
 
     @Test
+    void shouldReturnBookDetailsWhenBookIdIsValid() throws BookNotFoundException {
+        String bookName = "Eclipse (Twilight, #3)";
+        Book book = new BookTestBuilder().withName(bookName).build();
+        book = bookRepository.save(book);
+
+        Book bookDetails = bookService.fetchByBookId(book.getId());
+
+        assertEquals(bookName, bookDetails.getName());
+    }
+
+    @Test
     void shouldParseCSVFileWhenCSVIsUploaded() throws IOException {
         InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
         MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
