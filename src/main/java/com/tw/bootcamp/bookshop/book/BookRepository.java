@@ -10,4 +10,6 @@ public interface BookRepository extends JpaRepository<Book, Long>  {
     List<Book> findAllByOrderByNameAsc();
 
     Book findById(long id);
+
+    Book findByIsbn(String isbn);
 }

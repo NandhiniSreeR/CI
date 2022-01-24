@@ -64,6 +64,7 @@ class BookControllerTest {
         this.mockMvc.perform(multipart("/admin/load-books")
                 .file(file))
                 .andExpect(status().isOk());
+        if (uploadStream != null) { uploadStream.close(); }
     }
 
     @Test
@@ -74,6 +75,7 @@ class BookControllerTest {
         this.mockMvc.perform(multipart("/admin/load-books")
                 .file(file))
                 .andExpect(status().isBadRequest());
+        if (uploadStream != null) { uploadStream.close(); }
     }
 
     @Test
@@ -93,6 +95,7 @@ class BookControllerTest {
                 .andExpect(status().isOk());
 
         verify(bookService, times(1)).loadBooks(any());
+        if (uploadStream != null) { uploadStream.close(); }
     }
 
 

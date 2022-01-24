@@ -4,10 +4,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 class BookServiceTest {
@@ -44,5 +49,43 @@ class BookServiceTest {
 
         assertEquals(2, books.size());
         assertEquals("Animal Farm", books.get(0).getName());
+    }
+
+    @Test
+    void shouldParseCSVFileWhenCSVIsUploaded() throws IOException {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
+        MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
+
+        List<Book> books = bookService.csvToBooks(file.getInputStream());
+        assertEquals(2, books.size());
+        assertEquals("City of Jones (The Mortal Instruments, #1)", books.get(0).getName());
+        if (uploadStream != null) {
+            uploadStream.close();
+        }
+    }
+
+    @Test
+    void shouldPersistBooksGivenInCSV() {
+        List<Book> books = new ArrayList<>();
+        Book book = Book.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(500)
+                .booksCount(5)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("isbn")
+                .isbn13("isbn13")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        books.add(book);
+
+        List<Book> failedBooks = bookService.persistBooks(books);
+        assertEquals(0, failedBooks.size());
+        assertNotNull(bookRepository.findByIsbn("isbn"));
     }
 }
