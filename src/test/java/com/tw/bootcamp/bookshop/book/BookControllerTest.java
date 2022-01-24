@@ -108,4 +108,17 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.name").value("Harry Potter"));
         verify(bookService, times(1)).fetchByBookId(56L);
     }
+
+    @Test
+    void shouldRespondBookDetailsNotFoundWhenBookIdIsInValid() throws Exception {
+        long INVALID_BOOK_ID = 0L;
+        when(bookService.fetchByBookId(INVALID_BOOK_ID)).thenThrow(new BookNotFoundException());
+
+        mockMvc.perform(get("/book/" + INVALID_BOOK_ID)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").
+                        value("Book details not found found for the book id"));
+        verify(bookService, times(1)).fetchByBookId(INVALID_BOOK_ID);
+    }
 }
