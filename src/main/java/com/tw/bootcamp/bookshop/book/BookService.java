@@ -3,6 +3,7 @@ package com.tw.bootcamp.bookshop.book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,10 @@ public class BookService {
 
     public List<Book> fetchAll() {
         return bookRepository.findAllByOrderByNameAsc();
+    }
+
+    public boolean loadBooks(InputStream stream) {
+        return true;
     }
 
     public Book fetchByBookId(Long id) throws BookNotFoundException {

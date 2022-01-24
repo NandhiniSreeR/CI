@@ -6,10 +6,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +40,15 @@ public class BookController {
         return books.stream()
                 .map(book -> book.toResponse())
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping("/admin/load-books")
+    public ResponseEntity<?> loadBooks(@RequestParam("file") MultipartFile file) throws IOException {
+        if(file == null || file.getContentType() == null || !file.getContentType().equals("text/csv")) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        bookService.loadBooks(file.getInputStream());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/book/{id}")

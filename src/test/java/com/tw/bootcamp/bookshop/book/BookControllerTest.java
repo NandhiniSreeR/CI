@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,6 +55,46 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.length()").value(0));
         verify(bookService, times(1)).fetchAll();
     }
+
+    @Test
+    void shouldReturnStatusOkWhenCSVFileIsUploaded() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
+        MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
+
+        this.mockMvc.perform(multipart("/admin/load-books")
+                .file(file))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnStatusBadRequestWhenTextFileIsUploaded() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.txt");
+        MockMultipartFile file = new MockMultipartFile("file", "Book List.txt", "text/plain", uploadStream);
+
+        this.mockMvc.perform(multipart("/admin/load-books")
+                .file(file))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenFileIsMissing() throws Exception {
+        this.mockMvc.perform(post("/admin/load-books"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldCallLoadBooksMethodWhenValidCSVFileIsUploaded() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
+        MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
+        when(bookService.loadBooks(any())).thenReturn(true);
+
+        this.mockMvc.perform(multipart("/admin/load-books")
+                .file(file))
+                .andExpect(status().isOk());
+
+        verify(bookService, times(1)).loadBooks(any());
+    }
+
 
     @Test
     void shouldReturnBookDetailsWhenBookIdIsValid() throws Exception {

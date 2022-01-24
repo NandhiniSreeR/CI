@@ -11,6 +11,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.validation.ConstraintViolationException;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -51,6 +53,19 @@ class AddressServiceTest {
     void shouldNotCreateAddressWhenUserIsNotValid() {
         CreateAddressRequest createRequest = createAddress();
         assertThrows(DataIntegrityViolationException.class, ()-> addressService.create(createRequest, null));
+    }
+
+    @Test
+    void shouldDisplayUserAddressesWhenGivenUserEmail() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = createAddress();
+        Address address = addressService.create(createRequest, user);
+        // ACT
+        List<Address> userAddresses =  addressService.loadAddressFromUserName(user);
+        // ASSERT
+        assertEquals(1, userAddresses.size());
+        assertEquals(address.getId(), userAddresses.get(0).getId());
     }
 
     private CreateAddressRequest invalidAddress() {
