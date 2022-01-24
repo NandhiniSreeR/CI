@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user.address;
 
+import com.tw.bootcamp.bookshop.error.EmailDoesNotExistException;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,7 +45,7 @@ public class AddressController {
             schema = @Schema(implementation = ResponseEntity.class))})}
     )
     public ResponseEntity<List<Address>> findByUserEmail(@PathVariable("user-email") String userEmail) {
-        User user = userService.findByEmail(userEmail).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userService.findByEmail(userEmail).orElseThrow(EmailDoesNotExistException::new);
         List<Address> addresses = addressService.loadAddressFromUserName(user);
         return new ResponseEntity<>(addresses, HttpStatus.OK);
     }
