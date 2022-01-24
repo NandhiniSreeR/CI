@@ -8,8 +8,4 @@ import java.util.List;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long>  {
     List<Book> findAllByOrderByNameAsc();
-
-    Book findByIsbn(String isbn);
-
-    List<Book> findByIdIn(List<Long> bookIds);
 }
