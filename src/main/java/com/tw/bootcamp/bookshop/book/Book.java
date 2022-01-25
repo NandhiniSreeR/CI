@@ -2,6 +2,7 @@ package com.tw.bootcamp.bookshop.book;
 
 import com.opencsv.bean.CsvBindByName;
 import com.tw.bootcamp.bookshop.money.Money;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,21 +19,27 @@ import javax.validation.constraints.NotNull;
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(example = "1", description = "Unique Identifier of the Book")
     private Long id;
     @CsvBindByName(column = "title")
     @NotBlank
+    @Schema(example = "Harry Potter", description = "Name of the Book")
     private String name;
     @CsvBindByName(column = "author")
     @NotBlank
+    @Schema(example = "J.K. Rowling", description = "Author of the Book")
     private String authorName;
     @CsvBindByName(column = "price")
     @Column(columnDefinition = "NUMERIC")
     @NotNull
+    @Schema(example = "1000", description = "Price of the Book")
     private Double amount;
     private String currency;
     @CsvBindByName(column = "image_url")
+    @Schema(example = "www.image.jpg", description = "Image Url of the Book")
     private String imageUrl;
     @CsvBindByName(column = "small_image_url")
+    @Schema(example = "www.Smallimage.jpg", description = "Small Image Url of the Book")
     private String smallImageUrl;
     @Column(columnDefinition = "NUMERIC")
     @CsvBindByName(column = "books_count")
@@ -52,6 +59,7 @@ public class Book {
     @CsvBindByName(column = "average_rating")
     private Double averageRating;
     @Transient
+    @Schema(example = "True", description = "Is book Available or not")
     private boolean isAvailable;
 
     public BookResponse toResponse() {

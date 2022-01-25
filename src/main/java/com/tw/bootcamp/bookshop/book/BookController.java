@@ -2,6 +2,7 @@ package com.tw.bootcamp.bookshop.book;
 
 import com.opencsv.bean.CsvToBeanBuilder;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,7 +46,7 @@ public class BookController {
     }
 
     @PostMapping("/admin/load-books")
-    public ResponseEntity<?> loadBooks(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> loadBooks(@Parameter(description = "A CSV file with book details" , example = "books.csv") @RequestParam("file") MultipartFile file) throws IOException {
         if (file == null || file.getContentType() == null || !file.getContentType().equals("text/csv")) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -62,7 +63,7 @@ public class BookController {
                             schema = @Schema(implementation = BookDetailsResponse.class))}),
             @ApiResponse(responseCode = "404", content = @Content)
     })
-    BookDetailsResponse fetch(@PathVariable Long id) throws BookNotFoundException {
+    BookDetailsResponse fetch(@Parameter(description = "Unique identifier of the book") @PathVariable Long id) throws BookNotFoundException {
         Book book = bookService.fetchByBookId(id);
         return book.toBookDetailsResponse();
     }

@@ -29,7 +29,7 @@ public class AddressController {
     @Operation(summary = "Create address", description = "Creates address for user", tags = {"Address Service"})
     @ApiResponses(value = {@ApiResponse(responseCode = "201",
             description = "Address created", content = {@Content(mediaType = "application/json",
-            schema = @Schema(implementation = ResponseEntity.class))})}
+            schema = @Schema(implementation = AddressResponse.class))})}
     )
     public ResponseEntity<AddressResponse> create(@RequestBody CreateAddressRequest createRequest, Principal principal) {
         User user = userService.findByEmail(principal.getName()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -42,7 +42,7 @@ public class AddressController {
     @Operation(summary = "Get addresses by user email", description = "Returns addresses by user email", tags = {"Address Service"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200",
             description = "Addresses returned", content = {@Content(mediaType = "application/json",
-            schema = @Schema(implementation = ResponseEntity.class))})}
+            schema = @Schema(implementation = Address.class))})}
     )
     public ResponseEntity<List<Address>> findByUserEmail(Principal principal) {
         User user = userService.findByEmail(principal.getName()).orElseThrow(EmailDoesNotExistException::new);

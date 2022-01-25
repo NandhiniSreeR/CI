@@ -1,6 +1,7 @@
 package com.tw.bootcamp.bookshop.user.address;
 
 import com.tw.bootcamp.bookshop.user.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,17 +19,25 @@ import java.util.Objects;
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(example = "1", description = "Unique Identifier of Address")
     private Long id;
     @NotBlank
+    @Schema(example = "24/l XYZ society", description = "Address line 1")
     private String lineNoOne;
+    @Schema(example = "Near some hotel", description = "Address line 2")
     private String lineNoTwo;
     @NotBlank
+    @Schema(example = "Pune", description = "City Name")
     private String city;
+    @Schema(example = "Maharashtra", description = "State Name")
     private String state;
     @NotBlank
+    @Schema(example = "411006", description = "Pin code")
     private String pinCode;
     @NotBlank
+    @Schema(example = "India", description = "Country Name")
     private String country;
+    @Schema(example = "true", description = "User's default shipping address")
     private boolean isDefault;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
