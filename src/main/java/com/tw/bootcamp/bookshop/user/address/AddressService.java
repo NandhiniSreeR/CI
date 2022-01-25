@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AddressService {
@@ -19,5 +20,9 @@ public class AddressService {
 
     public List<Address> loadAddressFromUserName(User user) {
         return addressRepository.findAllByUser(user);
+    }
+
+    public Optional<Address> loadAddressById(Long addressId){
+        return addressRepository.findById(addressId);
     }
 }
