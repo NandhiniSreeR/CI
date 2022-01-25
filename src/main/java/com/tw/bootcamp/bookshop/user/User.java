@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,11 +24,15 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(example = "1", description = "Unique identifier of the user")
     private Long id;
     @NotBlank(message = "Email is mandatory")
+    @Schema(example = "user@example.com", description = "email of user")
     private String email;
     @NotBlank(message = "Password is mandatory")
+    @Schema(example = "password", description = "password of user")
     private String password;
+    @Schema(example = "USER", description = "Role assigned to user")
     @Enumerated(EnumType.STRING)
     private Role role;
 
