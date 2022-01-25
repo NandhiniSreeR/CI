@@ -76,15 +76,14 @@ class AddressControllerTest {
 
     @Test
     void shouldReturnAddressesForUserWhenEmailExists() throws Exception {
-        String userEmail = "testemail@test.com";
         User user = new UserTestBuilder().build();
-        when(userService.findByEmail(userEmail)).thenReturn(Optional.of(user));
+        when(userService.findByEmail(anyString())).thenReturn(Optional.of(user));
 
         Address address = new AddressTestBuilder().build();
         List<Address> addresses = Collections.singletonList(address);
         when(addressService.loadAddressFromUserName(user)).thenReturn(addresses);
 
-        mockMvc.perform(get("/addresses/" + userEmail))
+        mockMvc.perform(get("/addresses/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$[0]").exists())
@@ -93,12 +92,11 @@ class AddressControllerTest {
 
     @Test
     void shouldFailToReturnAddressesForUserWhenEmailDoesNotExist() throws Exception{
-        String invalidEmail = "test@test.com";
-        when(userService.findByEmail(invalidEmail)).thenReturn(Optional.empty());
+        when(userService.findByEmail(anyString())).thenReturn(Optional.empty());
         List<Address> addresses = Collections.singletonList(new AddressTestBuilder().build());
         when(addressService.loadAddressFromUserName(any(User.class))).thenReturn(addresses);
 
-        mockMvc.perform(get("/addresses/" + invalidEmail))
+        mockMvc.perform(get("/addresses/"))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("User email does not exist"));
     }
