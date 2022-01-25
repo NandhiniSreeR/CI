@@ -1,16 +1,16 @@
 package com.tw.bootcamp.bookshop.user;
 
-import com.tw.bootcamp.bookshop.user.address.Address;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.List;
+import java.util.Objects;
 
 @Builder
 @Getter
@@ -30,8 +30,10 @@ public class User {
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
-    @OneToMany(mappedBy = "user")
-    private List<Address> addresses;
+
+    // NOTE: 25/01/22 : Nandhini + Devesh - Do not uncomment this unless you have better solution, it creates infinite chain of nested objects
+    /*@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<Address> addresses;*/
 
     private User(String email, String password, Role role) {
         this.email = email;
@@ -45,5 +47,18 @@ public class User {
             password = PASSWORD_ENCODER.encode(userRequest.getPassword());
         }
         return new User(userRequest.getEmail(), password, Role.USER);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return id != null && Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
