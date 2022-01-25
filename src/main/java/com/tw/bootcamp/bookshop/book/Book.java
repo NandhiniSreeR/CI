@@ -42,6 +42,7 @@ public class Book {
     private String originalTitle;
     @CsvBindByName(column = "language_code")
     private String languageCode;
+    @Column(columnDefinition = "NUMERIC")
     @CsvBindByName(column = "average_rating")
     private Double averageRating;
 
