@@ -11,7 +11,7 @@ public class OrderService {
 
     @Transactional
     public Order create(Order order) {
-        order.getBookToPurchase().decreaseBookCountByOne();
+        order.getBookToPurchase().decreaseBookCountByQuantity(order.getQuantity());
         return orderRepository.save(order);
     }
 

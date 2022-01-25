@@ -85,10 +85,6 @@ public class Book {
                 .build();
     }
 
-    public void decreaseBookCountByOne() {
-        this.booksCount--;
-    }
-
     public void update(Book book) {
         this.authorName = book.authorName;
         this.name = book.name;
@@ -105,5 +101,9 @@ public class Book {
 
     public void isAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
+    }
+
+    public void decreaseBookCountByQuantity(int quantity) {
+        this.booksCount -= quantity;
     }
 }
