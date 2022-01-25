@@ -367,4 +367,28 @@ class BookServiceTest {
         assertNull(bookRepository.findByIsbn13("harrypotter1"));
     }
 
+    @Test
+    void shouldNotPersistWhenBothIsbnAndIsbn13AreBlank() {
+        List<Book> books = new ArrayList<>();
+        Book book = Book.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(600D)
+                .booksCount(123)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("")
+                .isbn13("")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        books.add(book);
+
+        bookService.loadBooks(books);
+        assertNull(bookRepository.findByIsbn13AndIsbn("",""));
+    }
+
 }

@@ -34,7 +34,7 @@ public class Book {
     @NotNull
     @Schema(example = "1000", description = "Price of the Book")
     private Double amount;
-    private String currency;
+    private String currency = "INR";
     @CsvBindByName(column = "image_url")
     @Schema(example = "www.image.jpg", description = "Image Url of the Book")
     private String imageUrl;

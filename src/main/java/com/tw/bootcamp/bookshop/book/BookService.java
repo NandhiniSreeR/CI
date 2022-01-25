@@ -38,7 +38,10 @@ public class BookService {
             try {
                 Book existingBook = getExistingBook(book);
                 if (existingBook == null) {
-                    bookRepository.save(book);
+                    boolean validIsbn = !(book.getIsbn().isEmpty() && book.getIsbn13().isEmpty());
+                    if (validIsbn) {
+                        bookRepository.save(book);
+                    }
                 } else {
                     existingBook.update(book);
                     bookRepository.save(existingBook);
