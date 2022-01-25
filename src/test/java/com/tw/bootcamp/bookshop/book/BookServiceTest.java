@@ -12,8 +12,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class BookServiceTest {
@@ -55,11 +54,12 @@ class BookServiceTest {
     @Test
     void shouldReturnBookDetailsWhenBookIdIsValid() throws BookNotFoundException {
         String bookName = "Eclipse (Twilight, #3)";
-        Book book = new BookTestBuilder().
-                withName(bookName).
-                withImageUrl("image.jpg").
-                withSmallImageUrl("imageS.jpg").
-                withBooksCount(10).build();
+        Book book = new BookTestBuilder()
+                .withName(bookName)
+                .withImageUrl("image.jpg")
+                .withSmallImageUrl("imageS.jpg")
+                .withBooksCount(10)
+                .build();
         book = bookRepository.save(book);
 
         Book bookDetails = bookService.fetchByBookId(book.getId());
@@ -68,7 +68,7 @@ class BookServiceTest {
         assertEquals("J K Rowling", bookDetails.getAuthorName());
         assertEquals("image.jpg", bookDetails.getImageUrl());
         assertEquals("imageS.jpg", bookDetails.getSmallImageUrl());
-        assertEquals(true, bookDetails.isAvailable());
+        assertTrue(bookDetails.isAvailable());
         assertEquals(300, bookDetails.getAmount());
 
     }
@@ -82,7 +82,7 @@ class BookServiceTest {
 
         Book bookDetails = bookService.fetchByBookId(book.getId());
 
-        assertEquals(true, bookDetails.isAvailable());
+        assertTrue(bookDetails.isAvailable());
     }
 
     @Test
@@ -94,7 +94,7 @@ class BookServiceTest {
 
         Book bookDetails = bookService.fetchByBookId(book.getId());
 
-        assertEquals(false, bookDetails.isAvailable());
+        assertFalse(bookDetails.isAvailable());
     }
 
     @Test
