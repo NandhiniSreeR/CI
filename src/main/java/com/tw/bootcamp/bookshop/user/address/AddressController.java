@@ -38,14 +38,14 @@ public class AddressController {
         return new ResponseEntity<>(addressResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{user-email}")
+    @GetMapping
     @Operation(summary = "Get addresses by user email", description = "Returns addresses by user email", tags = {"Address Service"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200",
             description = "Addresses returned", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseEntity.class))})}
     )
-    public ResponseEntity<List<Address>> findByUserEmail(@PathVariable("user-email") String userEmail) {
-        User user = userService.findByEmail(userEmail).orElseThrow(EmailDoesNotExistException::new);
+    public ResponseEntity<List<Address>> findByUserEmail(Principal principal) {
+        User user = userService.findByEmail(principal.getName()).orElseThrow(EmailDoesNotExistException::new);
         List<Address> addresses = addressService.loadAddressFromUserName(user);
         return new ResponseEntity<>(addresses, HttpStatus.OK);
     }

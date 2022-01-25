@@ -134,4 +134,95 @@ class BookServiceTest {
         assertEquals(0, failedBooks.size());
         assertNotNull(bookRepository.findByIsbn("isbn"));
     }
+
+    @Test
+    void shouldUpdateBookCountWhenUploadingBooksWithSameIsbn13() {
+        List<Book> initialBooks = new ArrayList<>();
+        Book book = Book.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(500)
+                .booksCount(5)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("isbn")
+                .isbn13("harrypotter1")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        initialBooks.add(book);
+
+        bookService.persistBooks(initialBooks);
+
+        List<Book> updatedBooks = new ArrayList<>();
+        Book updatedBook = Book.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(500)
+                .booksCount(15)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("isbn")
+                .isbn13("harrypotter1")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        updatedBooks.add(updatedBook);
+
+        bookService.persistBooks(updatedBooks);
+
+        assertEquals(20, bookRepository.findByIsbn13("harrypotter1").getBooksCount());
+    }
+
+    @Test
+    void shouldUpdateBookCountWhenUploadingBooksWhenIsbn13isMissingAndHasSameIsbn() {
+        List<Book> initialBooks = new ArrayList<>();
+        Book book = Book.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(500)
+                .booksCount(5)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("harrypotter1")
+                .isbn13("")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        initialBooks.add(book);
+
+        bookService.persistBooks(initialBooks);
+
+        List<Book> updatedBooks = new ArrayList<>();
+        Book updatedBook = Book.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(500)
+                .booksCount(15)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("harrypotter1")
+                .isbn13("harrypotter1")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        updatedBooks.add(updatedBook);
+
+        bookService.persistBooks(updatedBooks);
+
+        assertEquals(20, bookRepository.findByIsbn("harrypotter1").getBooksCount());
+    }
+
 }

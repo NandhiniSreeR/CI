@@ -42,6 +42,7 @@ public class Book {
     private String originalTitle;
     @CsvBindByName(column = "language_code")
     private String languageCode;
+    @Column(columnDefinition = "NUMERIC")
     @CsvBindByName(column = "average_rating")
     private Double averageRating;
     private boolean isAvailable;
@@ -56,6 +57,10 @@ public class Book {
                 .smallImageUrl(smallImageUrl)
                 .isAvailable(isAvailable)
                 .build();
+    }
+
+    public void setBooksCount(int booksCount) {
+        this.booksCount = booksCount;
     }
 
     public void isAvailable(boolean isAvailable) {

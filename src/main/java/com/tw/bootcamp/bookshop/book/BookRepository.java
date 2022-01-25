@@ -6,10 +6,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Long>  {
+public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findAllByOrderByNameAsc();
 
     Book findById(long id);
 
     Book findByIsbn(String isbn);
+
+    Book findByIsbn13(String isbn13);
 }
