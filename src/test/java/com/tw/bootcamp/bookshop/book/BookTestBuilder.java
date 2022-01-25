@@ -29,4 +29,19 @@ public class BookTestBuilder {
         bookBuilder.id(id);
         return this;
     }
+
+    public BookTestBuilder withBooksCount(Integer booksCount) {
+        bookBuilder.booksCount(booksCount);
+        return this;
+    }
+
+    public BookTestBuilder withImageUrl(String imageUrl) {
+        bookBuilder.imageUrl(imageUrl);
+        return this;
+    }
+
+    public BookTestBuilder withSmallImageUrl(String smallImageUrl) {
+        bookBuilder.smallImageUrl(smallImageUrl);
+        return this;
+    }
 }

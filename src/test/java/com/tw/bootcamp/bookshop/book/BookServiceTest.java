@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.book;
 
+import com.tw.bootcamp.bookshop.money.Money;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +55,46 @@ class BookServiceTest {
     @Test
     void shouldReturnBookDetailsWhenBookIdIsValid() throws BookNotFoundException {
         String bookName = "Eclipse (Twilight, #3)";
-        Book book = new BookTestBuilder().withName(bookName).build();
+        Book book = new BookTestBuilder().
+                withName(bookName).
+                withImageUrl("image.jpg").
+                withSmallImageUrl("imageS.jpg").
+                withBooksCount(10).build();
         book = bookRepository.save(book);
 
         Book bookDetails = bookService.fetchByBookId(book.getId());
 
-        assertEquals(bookName, bookDetails.getName());
+        assertEquals("Eclipse (Twilight, #3)", bookDetails.getName());
+        assertEquals("J K Rowling", bookDetails.getAuthorName());
+        assertEquals("image.jpg", bookDetails.getImageUrl());
+        assertEquals("imageS.jpg", bookDetails.getSmallImageUrl());
+        assertEquals(true, bookDetails.isAvailable());
+        assertEquals(300, bookDetails.getAmount());
+
+    }
+
+    @Test
+    void shouldReturnBookIsAvailableAsTrueWhenBookIsInInventory() throws BookNotFoundException {
+        String bookName = "Eclipse (Twilight, #3)";
+        int booksCount = 10;
+        Book book = new BookTestBuilder().withName(bookName).withBooksCount(booksCount).build();
+        book = bookRepository.save(book);
+
+        Book bookDetails = bookService.fetchByBookId(book.getId());
+
+        assertEquals(true, bookDetails.isAvailable());
+    }
+
+    @Test
+    void shouldReturnBookIsAvailableAsFalseWhenBookIsNotInInventory() throws BookNotFoundException {
+        String bookName = "Eclipse (Twilight, #3)";
+        int booksCount = 0;
+        Book book = new BookTestBuilder().withName(bookName).withBooksCount(booksCount).build();
+        book = bookRepository.save(book);
+
+        Book bookDetails = bookService.fetchByBookId(book.getId());
+
+        assertEquals(false, bookDetails.isAvailable());
     }
 
     @Test

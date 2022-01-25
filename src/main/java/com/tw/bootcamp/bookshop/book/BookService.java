@@ -30,7 +30,16 @@ public class BookService {
 
     public Book fetchByBookId(Long id) throws BookNotFoundException {
         Optional<Book> book = bookRepository.findById(id);
-        return book.orElseThrow(BookNotFoundException::new);
+        if(book.isPresent()){
+            Book bookDetails = book.get();
+            if (bookDetails.getBooksCount() > 0) {
+                bookDetails.isAvailable(true);
+            } else {
+                bookDetails.isAvailable(false);
+            }
+            return bookDetails;
+        }
+        throw new BookNotFoundException();
     }
 
     public List<Book> csvToBooks(InputStream csvInputStream) {

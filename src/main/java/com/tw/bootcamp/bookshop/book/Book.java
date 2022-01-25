@@ -44,6 +44,7 @@ public class Book {
     private String languageCode;
     @CsvBindByName(column = "average_rating")
     private Double averageRating;
+    private boolean isAvailable;
 
     public BookResponse toResponse() {
         return BookResponse.builder()
@@ -51,6 +52,13 @@ public class Book {
                 .name(name)
                 .authorName(authorName)
                 .price(new Money("INR", amount))
+                .imageUrl(imageUrl)
+                .smallImageUrl(smallImageUrl)
+                .isAvailable(isAvailable)
                 .build();
+    }
+
+    public void isAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
     }
 }
