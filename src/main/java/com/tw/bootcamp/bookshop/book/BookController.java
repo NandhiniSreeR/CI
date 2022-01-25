@@ -46,14 +46,14 @@ public class BookController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping("/admin/load-books")
+    @PostMapping(value = "/admin/load-books",consumes = "multipart/form-data")
     @Operation(summary = "Load all books from CSV file", description = "Load all books from CSV file in inventory", tags = {"Books Service"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Books are loaded in Inventory",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ResponseEntity.class))})
     })
-    public ResponseEntity<?> loadBooks(@Parameter(in = ParameterIn.QUERY,example = "books.csv" , description = "A CSV file with book details") @RequestParam ("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> loadBooks(@Parameter(description = "A CSV file with book details") @RequestParam ("file") MultipartFile file) throws IOException {
         if (file == null || file.getContentType() == null || !file.getContentType().equals("text/csv")) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

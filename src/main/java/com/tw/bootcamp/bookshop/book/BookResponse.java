@@ -16,7 +16,6 @@ public class BookResponse {
     private String name;
     @Schema(example = "J.K. Rowling", description = "Author of the Book")
     private String authorName;
-    @Schema(example = "1000", description = "Price of the Book")
     private Money price;
     @Schema(example = "www.image.jpg", description = "Image Url of the Book")
     private String imageUrl;

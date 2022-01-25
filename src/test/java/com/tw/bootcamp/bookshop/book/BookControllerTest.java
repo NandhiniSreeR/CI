@@ -87,7 +87,7 @@ class BookControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenFileIsMissing() throws Exception {
-        this.mockMvc.perform(post("/admin/load-books"))
+        this.mockMvc.perform(multipart("/admin/load-books"))
                 .andExpect(status().isBadRequest());
     }
 
