@@ -3,7 +3,6 @@ package com.tw.bootcamp.bookshop.book;
 import com.opencsv.bean.CsvToBeanBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +39,22 @@ public class BookController {
     })
     List<BookResponse> list() {
         List<Book> books = bookService.fetchAll();
+        return books.stream()
+                .map(Book::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @RequestMapping(value = "/books", params = "title")
+    @Operation(summary = "Search books by title",
+            description = "Case insensitive search on books by title that will be ordered in ascending",
+            tags = {"Books Service"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Search books by title",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BookResponse.class))})
+    })
+    List<BookResponse> listByTitle(@RequestParam String title) {
+        List<Book> books = bookService.fetchBooksByTitle(title);
         return books.stream()
                 .map(Book::toResponse)
                 .collect(Collectors.toList());

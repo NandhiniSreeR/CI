@@ -18,7 +18,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,6 +58,34 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
         verify(bookService, times(1)).fetchAll();
+    }
+
+    @Test
+    void shouldFetchMatchingBooksOnTitleSearch() throws Exception {
+        List<Book> books = new ArrayList<>();
+        Book book = new BookTestBuilder().build();
+        books.add(book);
+        when(bookService.fetchBooksByTitle("Harry")).thenReturn(books);
+
+        mockMvc.perform(get("/books")
+                        .param("title","Harry")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+        verify(bookService, times(1)).fetchBooksByTitle("Harry");
+    }
+
+    @Test
+    void shouldReturnEmptyListOnTitleSearchWhenNoMatchingBooksFound() throws Exception {
+        List<Book> books = new ArrayList<>();
+        when(bookService.fetchBooksByTitle("Animal")).thenReturn(books);
+
+        mockMvc.perform(get("/books")
+                        .param("title","Animal")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+        verify(bookService, times(1)).fetchBooksByTitle("Animal");
     }
 
     @Test

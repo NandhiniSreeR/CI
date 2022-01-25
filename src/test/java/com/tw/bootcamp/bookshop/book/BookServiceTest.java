@@ -48,6 +48,67 @@ class BookServiceTest {
     }
 
     @Test
+    void shouldFetchMatchingBooksOnTitleSearch() {
+        Book wingsOfFire = new BookTestBuilder().withName("Wings of Fire").build();
+        Book animalFarm = new BookTestBuilder().withName("Animal Farm").build();
+        bookRepository.save(wingsOfFire);
+        bookRepository.save(animalFarm);
+        String searchString = "Animal";
+
+        List<Book> books = bookService.fetchBooksByTitle(searchString);
+
+        assertEquals(1, books.size());
+        assertEquals("Animal Farm", books.get(0).getName());
+    }
+
+    @Test
+    void shouldReturnEmptyListOnTitleSearchWhenNoMatchingBooksFound() {
+        Book wingsOfFire = new BookTestBuilder().withName("Wings of Fire").build();
+        Book animalFarm = new BookTestBuilder().withName("Animal Farm").build();
+        bookRepository.save(wingsOfFire);
+        bookRepository.save(animalFarm);
+        String searchString = "Paper Book";
+
+        List<Book> books = bookService.fetchBooksByTitle(searchString);
+
+        assertEquals(0, books.size());
+    }
+
+    @Test
+    void shouldFetchMatchingBooksOnCaseInSensitiveTitleSearch() {
+        Book wingsOfFire = new BookTestBuilder().withName("Wings of Fire").build();
+        Book animalFarm = new BookTestBuilder().withName("Animal Farm").build();
+        bookRepository.save(wingsOfFire);
+        bookRepository.save(animalFarm);
+        String searchString = "animal";
+
+        List<Book> books = bookService.fetchBooksByTitle(searchString);
+
+        assertEquals(1, books.size());
+        assertEquals("Animal Farm", books.get(0).getName());
+    }
+
+    @Test
+    void shouldFetchMatchingBooksOnTitleSearchSortedByNameAscending() {
+        Book wingsOfFire = new BookTestBuilder().withName("Wings of Fire").build();
+        Book animalFarm = new BookTestBuilder().withName("Animal Farm").build();
+        Book animalFarms = new BookTestBuilder().withName("Animal Farms").build();
+        Book animalFarming = new BookTestBuilder().withName("Animal Farming").build();
+        bookRepository.save(wingsOfFire);
+        bookRepository.save(animalFarm);
+        bookRepository.save(animalFarms);
+        bookRepository.save(animalFarming);
+        String searchString = "Animal";
+
+        List<Book> books = bookService.fetchBooksByTitle(searchString);
+
+        assertEquals(3, books.size());
+        assertEquals("Animal Farm", books.get(0).getName());
+        assertEquals("Animal Farming", books.get(1).getName());
+        assertEquals("Animal Farms", books.get(2).getName());
+    }
+
+    @Test
     void shouldReturnBookDetailsWhenBookIdIsValid() throws BookNotFoundException {
         String bookName = "Eclipse (Twilight, #3)";
         Book book = new BookTestBuilder()

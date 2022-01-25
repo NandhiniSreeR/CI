@@ -58,4 +58,8 @@ public class BookService {
         }
         return existingBook;
     }
+
+    public List<Book> fetchBooksByTitle(String searchString) {
+        return bookRepository.findByNameContainsIgnoreCaseOrderByNameAsc(searchString);
+    }
 }
