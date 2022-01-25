@@ -8,9 +8,12 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookResponse {
+public class BookDetailsResponse {
     private Long id;
     private String name;
     private String authorName;
     private Money price;
+    private String imageUrl;
+    private String smallImageUrl;
+    private boolean isAvailable;
 }

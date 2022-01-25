@@ -2,7 +2,6 @@ package com.tw.bootcamp.bookshop.book;
 
 import com.opencsv.bean.CsvBindByName;
 import com.tw.bootcamp.bookshop.money.Money;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -51,6 +50,15 @@ public class Book {
 
     public BookResponse toResponse() {
         return BookResponse.builder()
+                .id(id)
+                .name(name)
+                .authorName(authorName)
+                .price(new Money("INR", amount))
+                .build();
+    }
+
+    public BookDetailsResponse toBookDetailsResponse() {
+        return BookDetailsResponse.builder()
                 .id(id)
                 .name(name)
                 .authorName(authorName)
