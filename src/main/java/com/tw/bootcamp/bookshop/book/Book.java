@@ -68,6 +68,8 @@ public class Book {
                 .name(name)
                 .authorName(authorName)
                 .price(new Money("INR", amount))
+                .imageUrl(imageUrl)
+                .smallImageUrl(smallImageUrl)
                 .build();
     }
 

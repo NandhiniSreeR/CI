@@ -18,4 +18,8 @@ public class BookResponse {
     private String authorName;
     @Schema(example = "1000", description = "Price of the Book")
     private Money price;
+    @Schema(example = "www.image.jpg", description = "Image Url of the Book")
+    private String imageUrl;
+    @Schema(example = "www.Smallimage.jpg", description = "Small Image Url of the Book")
+    private String smallImageUrl;
 }
