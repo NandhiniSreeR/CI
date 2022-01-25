@@ -6,6 +6,8 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @EqualsAndHashCode
@@ -19,12 +21,15 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @CsvBindByName(column = "title")
+    @NotBlank
     private String name;
     @CsvBindByName(column = "author")
+    @NotBlank
     private String authorName;
     @CsvBindByName(column = "price")
     @Column(columnDefinition = "NUMERIC")
-    private double amount;
+    @NotNull
+    private Double amount;
     private String currency;
     @CsvBindByName(column = "image_url")
     private String imageUrl;
@@ -32,6 +37,7 @@ public class Book {
     private String smallImageUrl;
     @Column(columnDefinition = "NUMERIC")
     @CsvBindByName(column = "books_count")
+    @NotNull
     private Integer booksCount;
     @CsvBindByName(column = "isbn13")
     private String isbn13;
@@ -61,8 +67,18 @@ public class Book {
                 .build();
     }
 
-    public void setBooksCount(int booksCount) {
-        this.booksCount = booksCount;
+    public void update(Book book) {
+        this.authorName = book.authorName;
+        this.name = book.name;
+        this.amount = book.amount;
+        this.currency = book.currency;
+        this.booksCount = book.booksCount + this.booksCount;
+        this.originalPublicationYear = book.originalPublicationYear;
+        this.imageUrl = book.imageUrl;
+        this.smallImageUrl = book.smallImageUrl;
+        this.languageCode = book.languageCode;
+        this.originalTitle = book.originalTitle;
+        this.averageRating = book.averageRating;
     }
 
     public void isAvailable(boolean isAvailable) {

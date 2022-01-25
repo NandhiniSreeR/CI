@@ -1,14 +1,13 @@
 package com.tw.bootcamp.bookshop.book;
 
-import com.tw.bootcamp.bookshop.money.Money;
-
 public class BookTestBuilder {
     private final Book.BookBuilder bookBuilder;
 
     public BookTestBuilder() {
         bookBuilder = Book.builder().name("Harry Potter")
                 .authorName("J K Rowling")
-                .amount(300);
+                .amount(300D)
+                .booksCount(5);
     }
 
     public Book build() {
@@ -16,7 +15,7 @@ public class BookTestBuilder {
     }
 
     public BookTestBuilder withPrice(int price) {
-        bookBuilder.amount(price);
+        bookBuilder.amount((double) price);
         return this;
     }
 

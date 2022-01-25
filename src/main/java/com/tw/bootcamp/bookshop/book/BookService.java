@@ -1,13 +1,8 @@
 package com.tw.bootcamp.bookshop.book;
 
-import com.opencsv.bean.CsvToBeanBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,10 +19,6 @@ public class BookService {
         return bookRepository.findAllByOrderByNameAsc();
     }
 
-    public boolean loadBooks(InputStream stream) {
-        return true;
-    }
-
     public Book fetchByBookId(Long id) throws BookNotFoundException {
         Optional<Book> book = bookRepository.findById(id);
         if(book.isPresent()){
@@ -42,30 +33,19 @@ public class BookService {
         throw new BookNotFoundException();
     }
 
-    public List<Book> csvToBooks(InputStream csvInputStream) {
-        Reader reader = new InputStreamReader(csvInputStream);
-        return new CsvToBeanBuilder(reader)
-                .withType(Book.class)
-                .build()
-                .parse();
-    }
-
-    public List<Book> persistBooks(List<Book> books) {
-        List<Book> failedBooks = new ArrayList<>();
+    public void loadBooks(List<Book> books) {
         books.forEach(book -> {
             try {
                 Book existingBook = getExistingBook(book);
                 if (existingBook == null) {
                     bookRepository.save(book);
                 } else {
-                    existingBook.setBooksCount(book.getBooksCount() + existingBook.getBooksCount());
+                    existingBook.update(book);
                     bookRepository.save(existingBook);
                 }
-            } catch (Exception e) {
-                failedBooks.add(book);
+            } catch (Exception ignored) {
             }
         });
-        return failedBooks;
     }
 
     public Book getExistingBook(Book book) {
