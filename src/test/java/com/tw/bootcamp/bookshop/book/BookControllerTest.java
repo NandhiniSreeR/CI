@@ -165,7 +165,7 @@ class BookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").
-                        value("Book details not found found for the book id"));
+                        value("Book details not found for the book id"));
         verify(bookService, times(1)).fetchByBookId(INVALID_BOOK_ID);
     }
 }

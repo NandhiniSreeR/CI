@@ -1,6 +1,5 @@
 package com.tw.bootcamp.bookshop.book;
 
-import com.tw.bootcamp.bookshop.money.Money;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,6 @@ class BookServiceTest {
         assertEquals("imageS.jpg", bookDetails.getSmallImageUrl());
         assertTrue(bookDetails.isAvailable());
         assertEquals(300, bookDetails.getAmount());
-
     }
 
     @Test
@@ -95,12 +93,12 @@ class BookServiceTest {
     }
 
     @Test
-    void shouldRespondBookDetailsNotFoundWhenBookIdIsInValid() throws BookNotFoundException {
+    void shouldRespondBookDetailsNotFoundWhenBookIdIsInValid() {
         Long INVALID_BOOK_ID = 0L;
 
         BookNotFoundException bookNotFoundException = assertThrows(BookNotFoundException.class,
                 () -> bookService.fetchByBookId(INVALID_BOOK_ID));
-        assertEquals("Book details not found found for the book id", bookNotFoundException.getMessage());
+        assertEquals("Book details not found for the book id", bookNotFoundException.getMessage());
     }
 
     @Test
