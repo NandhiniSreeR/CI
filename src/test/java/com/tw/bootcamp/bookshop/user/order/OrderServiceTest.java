@@ -1,93 +1,41 @@
 package com.tw.bootcamp.bookshop.user.order;
 
-import com.tw.bootcamp.bookshop.user.User;
-import com.tw.bootcamp.bookshop.user.UserRepository;
-import com.tw.bootcamp.bookshop.user.UserTestBuilder;
-import com.tw.bootcamp.bookshop.user.address.Address;
-import com.tw.bootcamp.bookshop.user.address.AddressRepository;
-import com.tw.bootcamp.bookshop.user.address.AddressService;
-import com.tw.bootcamp.bookshop.user.address.CreateAddressRequest;
-import org.junit.jupiter.api.AfterEach;
+import com.tw.bootcamp.bookshop.book.Book;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.validation.ConstraintViolationException;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private AddressRepository addressRepository;
-    @Autowired
-    private AddressService addressService;
 
-    @AfterEach
-    void tearDown() {
-        addressRepository.deleteAll();
-    }
+    @Mock
+    private OrderRepository orderRepository;
+
+    @InjectMocks
+    private OrderService orderService;
 
     @Test
-    void shouldCreateAddressWhenValid() {
-        User user = userRepository.save(new UserTestBuilder().build());
-        CreateAddressRequest createRequest = createAddress();
-
-        Address address = addressService.create(createRequest, user);
-
-        assertNotNull(address);
-        assertEquals("4 Privet Drive", address.getLineNoOne());
-        assertEquals(user.getId(), address.getUser().getId());
-    }
-
-    @Test
-    void shouldNotCreateAddressWhenInValid() {
-        User user = userRepository.save(new UserTestBuilder().build());
-        CreateAddressRequest createRequest = invalidAddress();
-
-        assertThrows(ConstraintViolationException.class, ()-> addressService.create(createRequest, user));
-    }
-
-    @Test
-    void shouldNotCreateAddressWhenUserIsNotValid() {
-        CreateAddressRequest createRequest = createAddress();
-        assertThrows(DataIntegrityViolationException.class, ()-> addressService.create(createRequest, null));
-    }
-
-    @Test
-    void shouldDisplayUserAddressesWhenGivenUserEmail() {
-        // ARRANGE
-        User user = userRepository.save(new UserTestBuilder().build());
-        CreateAddressRequest createRequest = createAddress();
-        Address address = addressService.create(createRequest, user);
-        // ACT
-        List<Address> userAddresses =  addressService.loadAddressFromUserName(user);
-        // ASSERT
-        assertEquals(1, userAddresses.size());
-        assertEquals(address.getId(), userAddresses.get(0).getId());
-    }
-
-    private CreateAddressRequest invalidAddress() {
-        return CreateAddressRequest.builder()
-                .lineNoOne("4 Privet Drive")
-                .lineNoTwo("Little Whinging")
-                .city(null)
-                .pinCode("A22 001")
-                .country("Surrey")
+    void createOrderAndVerifyIfInventoryIsReduced() {
+        Book purchasedBook = Book.builder()
+                .id(2222L)
+                .isbn13("book2222isbn13")
+                .booksCount(10)
                 .build();
-    }
-
-    private CreateAddressRequest createAddress() {
-        return CreateAddressRequest.builder()
-                .lineNoOne("4 Privet Drive")
-                .lineNoTwo("Little Whinging")
-                .city("Godstone")
-                .pinCode("A22 001")
-                .country("Surrey")
+        Order orderToCreate = Order.builder()
+                .id(111L)
+                .quantity(2)
+                .paymentMode(PaymentMode.CASH_ON_DELIVERY.toString())
+                .bookToPurchase(purchasedBook)
                 .build();
+        when(orderRepository.save(orderToCreate)).thenReturn(orderToCreate);
+
+        Order createdOrder = orderService.create(orderToCreate);
+
+        assertEquals(8, createdOrder.getBookToPurchase().getBooksCount());
     }
 }

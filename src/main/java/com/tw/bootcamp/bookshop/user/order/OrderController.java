@@ -36,7 +36,9 @@ public class OrderController {
     private BookService bookService;
 
     @PostMapping
-    @Operation(summary = "Create order", description = "Creates an order for user", tags = {"Order Service"})
+    @Operation(summary = "Create order",
+            description = "Creates an order for user with the details such as book quantity, payment mode, user address",
+            tags = {"Order Service"})
     @ApiResponses(value = {@ApiResponse(responseCode = "201",
             description = "Order created", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseEntity.class))})}
@@ -48,7 +50,6 @@ public class OrderController {
         Order orderToCreate = Order.create(createRequest, user, address, book);
         Order order = orderService.create(orderToCreate);
         OrderResponse orderResponse = order.toResponse();
-        System.out.println("orderResponse = " + orderResponse);
         return new ResponseEntity<>(orderResponse, HttpStatus.CREATED);
     }
 }
