@@ -98,6 +98,16 @@ class BookServiceTest {
     }
 
     @Test
+    void shouldRespondBookDetailsNotFoundWhenBookIdIsInValid() throws BookNotFoundException {
+        Long INVALID_BOOK_ID = 0L;
+
+        BookNotFoundException bookNotFoundException = assertThrows(BookNotFoundException.class,
+                () -> bookService.fetchByBookId(INVALID_BOOK_ID));
+        assertEquals("Book details not found found for the book id", bookNotFoundException.getMessage());
+    }
+
+
+    @Test
     void shouldParseCSVFileWhenCSVIsUploaded() throws IOException {
         InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
         MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
