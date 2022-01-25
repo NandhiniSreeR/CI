@@ -85,6 +85,10 @@ public class Book {
                 .build();
     }
 
+    public void decreaseBookCountByOne() {
+        this.booksCount--;
+    }
+
     public void update(Book book) {
         this.authorName = book.authorName;
         this.name = book.name;
