@@ -2,6 +2,7 @@ package com.tw.bootcamp.bookshop.book;
 
 import com.tw.bootcamp.bookshop.user.UserService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,6 +15,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -39,7 +42,7 @@ class BookControllerTest {
         when(bookService.fetchAll()).thenReturn(books);
 
         mockMvc.perform(get("/books")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
         verify(bookService, times(1)).fetchAll();
@@ -50,7 +53,7 @@ class BookControllerTest {
         when(bookService.fetchAll()).thenReturn(new ArrayList<>());
 
         mockMvc.perform(get("/books")
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
         verify(bookService, times(1)).fetchAll();
@@ -62,9 +65,11 @@ class BookControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
 
         this.mockMvc.perform(multipart("/admin/load-books")
-                .file(file))
+                        .file(file))
                 .andExpect(status().isOk());
-        if (uploadStream != null) { uploadStream.close(); }
+        if (uploadStream != null) {
+            uploadStream.close();
+        }
     }
 
     @Test
@@ -73,9 +78,11 @@ class BookControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "Book List.txt", "text/plain", uploadStream);
 
         this.mockMvc.perform(multipart("/admin/load-books")
-                .file(file))
+                        .file(file))
                 .andExpect(status().isBadRequest());
-        if (uploadStream != null) { uploadStream.close(); }
+        if (uploadStream != null) {
+            uploadStream.close();
+        }
     }
 
     @Test
@@ -88,14 +95,50 @@ class BookControllerTest {
     void shouldCallLoadBooksMethodWhenValidCSVFileIsUploaded() throws Exception {
         InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
         MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
-        when(bookService.loadBooks(any())).thenReturn(true);
+
+        Book firstBook = Book.builder()
+                .name("City of Jones (The Mortal Instruments, #1)")
+                .authorName("Cassandra Clare")
+                .amount(1461D)
+                .booksCount(178)
+                .averageRating(4.12)
+                .currency("INR")
+                .imageUrl("https://images.gr-assets.com/books/1432730315m/256683.jpg")
+                .smallImageUrl("https://images.gr-assets.com/books/1432730315s/256683.jpg")
+                .isbn("1416914285")
+                .isbn13("9781416914280")
+                .originalPublicationYear("2007")
+                .originalTitle("City of Bones")
+                .languageCode("eng")
+                .build();
 
         this.mockMvc.perform(multipart("/admin/load-books")
-                .file(file))
+                        .file(file))
                 .andExpect(status().isOk());
 
+        ArgumentCaptor<List<Book>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+
+        then(bookService).should().loadBooks(argumentCaptor.capture());
+        List<Book> capturedBooks = argumentCaptor.getValue();
+        Book firstCapturedBook = capturedBooks.get(0);
+
+        assertEquals(firstBook.getName(), firstCapturedBook.getName());
+        assertEquals(firstBook.getAuthorName(), firstCapturedBook.getAuthorName());
+        assertEquals(firstBook.getBooksCount(), firstCapturedBook.getBooksCount());
+        assertEquals(firstBook.getAmount(), firstCapturedBook.getAmount());
+        assertEquals(firstBook.getImageUrl(), firstCapturedBook.getImageUrl());
+        assertEquals(firstBook.getSmallImageUrl(), firstCapturedBook.getSmallImageUrl());
+        assertEquals(firstBook.getAverageRating(), firstCapturedBook.getAverageRating());
+        assertEquals(firstBook.getOriginalPublicationYear(), firstCapturedBook.getOriginalPublicationYear());
+        assertEquals(firstBook.getOriginalTitle(), firstCapturedBook.getOriginalTitle());
+        assertEquals(firstBook.getLanguageCode(), firstCapturedBook.getLanguageCode());
+        assertEquals(firstBook.getIsbn(), firstCapturedBook.getIsbn());
+        assertEquals(firstBook.getIsbn13(), firstCapturedBook.getIsbn13());
+
         verify(bookService, times(1)).loadBooks(any());
-        if (uploadStream != null) { uploadStream.close(); }
+        if (uploadStream != null) {
+            uploadStream.close();
+        }
     }
 
 

@@ -5,10 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,27 +103,13 @@ class BookServiceTest {
         assertEquals("Book details not found found for the book id", bookNotFoundException.getMessage());
     }
 
-
-    @Test
-    void shouldParseCSVFileWhenCSVIsUploaded() throws IOException {
-        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
-        MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
-
-        List<Book> books = bookService.csvToBooks(file.getInputStream());
-        assertEquals(2, books.size());
-        assertEquals("City of Jones (The Mortal Instruments, #1)", books.get(0).getName());
-        if (uploadStream != null) {
-            uploadStream.close();
-        }
-    }
-
     @Test
     void shouldPersistBooksGivenInCSV() {
         List<Book> books = new ArrayList<>();
         Book book = Book.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
-                .amount(500)
+                .amount(500D)
                 .booksCount(5)
                 .averageRating(4.5)
                 .currency("INR")
@@ -140,8 +123,7 @@ class BookServiceTest {
                 .build();
         books.add(book);
 
-        List<Book> failedBooks = bookService.persistBooks(books);
-        assertEquals(0, failedBooks.size());
+        bookService.loadBooks(books);
         assertNotNull(bookRepository.findByIsbn("isbn"));
     }
 
@@ -151,7 +133,7 @@ class BookServiceTest {
         Book book = Book.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
-                .amount(500)
+                .amount(500D)
                 .booksCount(5)
                 .averageRating(4.5)
                 .currency("INR")
@@ -165,13 +147,13 @@ class BookServiceTest {
                 .build();
         initialBooks.add(book);
 
-        bookService.persistBooks(initialBooks);
+        bookService.loadBooks(initialBooks);
 
         List<Book> updatedBooks = new ArrayList<>();
         Book updatedBook = Book.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
-                .amount(500)
+                .amount(500D)
                 .booksCount(15)
                 .averageRating(4.5)
                 .currency("INR")
@@ -185,18 +167,18 @@ class BookServiceTest {
                 .build();
         updatedBooks.add(updatedBook);
 
-        bookService.persistBooks(updatedBooks);
+        bookService.loadBooks(updatedBooks);
 
         assertEquals(20, bookRepository.findByIsbn13("harrypotter1").getBooksCount());
     }
 
     @Test
-    void shouldUpdateBookCountWhenUploadingBooksWhenIsbn13isMissingAndHasSameIsbn() {
+    void shouldUpdateBookCountWhenUploadingBooksAndIsbn13isMissingAndHasSameIsbn() {
         List<Book> initialBooks = new ArrayList<>();
         Book book = Book.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
-                .amount(500)
+                .amount(500D)
                 .booksCount(5)
                 .averageRating(4.5)
                 .currency("INR")
@@ -210,13 +192,13 @@ class BookServiceTest {
                 .build();
         initialBooks.add(book);
 
-        bookService.persistBooks(initialBooks);
+        bookService.loadBooks(initialBooks);
 
         List<Book> updatedBooks = new ArrayList<>();
         Book updatedBook = Book.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
-                .amount(500)
+                .amount(500D)
                 .booksCount(15)
                 .averageRating(4.5)
                 .currency("INR")
@@ -230,9 +212,161 @@ class BookServiceTest {
                 .build();
         updatedBooks.add(updatedBook);
 
-        bookService.persistBooks(updatedBooks);
+        bookService.loadBooks(updatedBooks);
 
         assertEquals(20, bookRepository.findByIsbn("harrypotter1").getBooksCount());
+    }
+
+    @Test
+    void shouldUpdateAllFieldsWhenUploadingBooksWithSameIsbn13() {
+        List<Book> initialBooks = new ArrayList<>();
+        Book book = Book.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(500D)
+                .booksCount(5)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("isbn")
+                .isbn13("harrypotter1")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        initialBooks.add(book);
+
+        bookService.loadBooks(initialBooks);
+
+        List<Book> updatedBooks = new ArrayList<>();
+        Book updatedBook = Book.builder()
+                .name("Harry_Potter")
+                .authorName("J.K.Rowling")
+                .amount(600D)
+                .booksCount(25)
+                .averageRating(4.7)
+                .currency("INR")
+                .imageUrl("imageUrl1")
+                .smallImageUrl("smallImageUrl1")
+                .isbn("isbn")
+                .isbn13("harrypotter1")
+                .originalPublicationYear("2014")
+                .originalTitle("Harry Potter Part 2")
+                .languageCode("LTN")
+                .build();
+        updatedBooks.add(updatedBook);
+
+        bookService.loadBooks(updatedBooks);
+
+        Book persistedBook = bookRepository.findByIsbn13("harrypotter1");
+
+        assertEquals(updatedBook.getName(), persistedBook.getName());
+        assertEquals(updatedBook.getAuthorName(), persistedBook.getAuthorName());
+        assertEquals(updatedBook.getBooksCount() + book.getBooksCount(), persistedBook.getBooksCount());
+        assertEquals(updatedBook.getAmount(), persistedBook.getAmount());
+        assertEquals(updatedBook.getImageUrl(), persistedBook.getImageUrl());
+        assertEquals(updatedBook.getSmallImageUrl(), persistedBook.getSmallImageUrl());
+        assertEquals(updatedBook.getAverageRating(), persistedBook.getAverageRating());
+        assertEquals(updatedBook.getOriginalPublicationYear(), persistedBook.getOriginalPublicationYear());
+        assertEquals(updatedBook.getOriginalTitle(), persistedBook.getOriginalTitle());
+        assertEquals(updatedBook.getLanguageCode(), persistedBook.getLanguageCode());
+    }
+
+    @Test
+    void shouldNotPersistWhenNameIsBlank() {
+        List<Book> books = new ArrayList<>();
+        Book book = Book.builder()
+                .name("")
+                .authorName("J K Rowling")
+                .amount(500D)
+                .booksCount(5)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("isbn")
+                .isbn13("harrypotter1")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        books.add(book);
+
+        bookService.loadBooks(books);
+        assertNull(bookRepository.findByIsbn13("harrypotter1"));
+    }
+
+    @Test
+    void shouldNotPersistWhenAuthorNameIsBlank() {
+        List<Book> books = new ArrayList<>();
+        Book book = Book.builder()
+                .name("Harry Potter")
+                .authorName("")
+                .amount(500D)
+                .booksCount(5)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("isbn")
+                .isbn13("harrypotter1")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        books.add(book);
+
+        bookService.loadBooks(books);
+        assertNull(bookRepository.findByIsbn13("harrypotter1"));
+    }
+
+    @Test
+    void shouldNotPersistWhenPriceIsBlank() {
+        List<Book> books = new ArrayList<>();
+        Book book = Book.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(null)
+                .booksCount(5)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("isbn")
+                .isbn13("harrypotter1")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        books.add(book);
+
+        bookService.loadBooks(books);
+        assertNull(bookRepository.findByIsbn13("harrypotter1"));
+    }
+
+    @Test
+    void shouldNotPersistWhenBookCountIsBlank() {
+        List<Book> books = new ArrayList<>();
+        Book book = Book.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(600D)
+                .booksCount(null)
+                .averageRating(4.5)
+                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("isbn")
+                .isbn13("harrypotter1")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        books.add(book);
+
+        bookService.loadBooks(books);
+        assertNull(bookRepository.findByIsbn13("harrypotter1"));
     }
 
 }
