@@ -54,4 +54,8 @@ public class Book {
                 .price(new Money("INR", amount))
                 .build();
     }
+
+    public void setBooksCount(int booksCount) {
+        this.booksCount = booksCount;
+    }
 }

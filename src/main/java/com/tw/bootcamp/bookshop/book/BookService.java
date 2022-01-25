@@ -45,11 +45,25 @@ public class BookService {
         List<Book> failedBooks = new ArrayList<>();
         books.forEach(book -> {
             try {
-                bookRepository.save(book);
+                Book existingBook = getExistingBook(book);
+                if (existingBook == null) {
+                    bookRepository.save(book);
+                } else {
+                    existingBook.setBooksCount(book.getBooksCount() + existingBook.getBooksCount());
+                    bookRepository.save(existingBook);
+                }
             } catch (Exception e) {
                 failedBooks.add(book);
             }
         });
         return failedBooks;
+    }
+
+    public Book getExistingBook(Book book) {
+        Book existingBook = bookRepository.findByIsbn13(book.getIsbn13());
+        if (existingBook == null) {
+            existingBook = bookRepository.findByIsbn(book.getIsbn());
+        }
+        return existingBook;
     }
 }
