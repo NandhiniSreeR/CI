@@ -2,6 +2,7 @@ package com.tw.bootcamp.bookshop.book;
 
 import com.opencsv.bean.CsvBindByName;
 import com.tw.bootcamp.bookshop.money.Money;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -45,6 +46,7 @@ public class Book {
     @Column(columnDefinition = "NUMERIC")
     @CsvBindByName(column = "average_rating")
     private Double averageRating;
+    @Transient
     private boolean isAvailable;
 
     public BookResponse toResponse() {
