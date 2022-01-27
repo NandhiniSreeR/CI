@@ -36,8 +36,8 @@ public class OrderController {
     private BookService bookService;
 
     @PostMapping
-    @Operation(summary = "Create order",
-            description = "Creates an order for user with the details such as book quantity, payment mode, user address",
+    @Operation(summary = "Create a new order for the logged in user",
+            description = "Creates an order for user with details such as book details, payment mode, user address",
             tags = {"Order Service"})
     @ApiResponses(value = {@ApiResponse(responseCode = "201",
             description = "Order created", content = {@Content(mediaType = "application/json",

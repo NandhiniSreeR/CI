@@ -39,7 +39,7 @@ public class AddressController {
     }
 
     @GetMapping
-    @Operation(summary = "Get addresses by user email", description = "Returns addresses by user email", tags = {"Address Service"})
+    @Operation(summary = "Get all addresses of logged in user", description = "Returns list of all addresses of the currently logged in user", tags = {"Address Service"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200",
             description = "Addresses returned", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = Address.class))})}

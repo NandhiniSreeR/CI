@@ -101,6 +101,9 @@ class AddressControllerTest {
                 .andExpect(jsonPath("$.message").value("User email does not exist"));
     }
 
+    //TODO : Modify address response to remove user details
+    //TODO : Default user implementation : within scope?
+
     private CreateAddressRequest createAddress() {
         return CreateAddressRequest.builder()
                 .lineNoOne("4 Privet Drive")
