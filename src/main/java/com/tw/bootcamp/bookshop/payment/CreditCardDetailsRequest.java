@@ -9,9 +9,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Date;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 
 @Getter
@@ -49,19 +48,16 @@ public class CreditCardDetailsRequest {
     }
 
     public static CreditCardDetailsRequest create(Long cardNumber, String cvv, String expiresOn, String cardHolderName) throws ParseException {
-        Date expiryDate = formatAsDate(expiresOn);
-        System.out.println("expiryDate = " + expiryDate);
+        YearMonth expiryYearMonth = formatAsYearMonth(expiresOn);
         if (cardNumber < 1000_0000_0000_0000L || cardNumber > 9999_9999_9999_9999L) throw new InvalidCreditCardDetailsException("Invalid Credit Card Number");
         if (!isValidCVVNumber(cvv)) throw new InvalidCreditCardDetailsException("Invalid CVV");
-        if (expiryDate.before(Date.from(Instant.now()))) throw new InvalidCreditCardDetailsException("Invalid Expiry Date");
+        if (expiryYearMonth.isBefore(YearMonth.now())) throw new InvalidCreditCardDetailsException("Invalid Expiry Date");
 
         return new CreditCardDetailsRequest(cardNumber, cvv, expiresOn, cardHolderName);
     }
 
-    private static Date formatAsDate(String expiresOn) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(EXPIRY_DATE_FORMAT);
-        dateFormat.setLenient(false);
-        return dateFormat.parse(expiresOn);
+    private static YearMonth formatAsYearMonth(String expiresOn) {
+        return YearMonth.parse(expiresOn, DateTimeFormatter.ofPattern(EXPIRY_DATE_FORMAT));
     }
 
     public static boolean isValidCVVNumber(String str)

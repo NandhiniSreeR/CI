@@ -88,4 +88,19 @@ class PaymentControllerTest {
                 .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    void shouldSucceedWhenInvokedWithCurrentMonthExpiry() throws Exception {
+        CreditCardDetailsRequest ccRequest = CreditCardDetailsRequest.builder()
+                .cardHolderName("John Smith")
+                .cardNumber(4311_5678_8987_3456L)
+                .expiresOn("01/2022")
+                .cvv("098")
+                .build();
+
+        mockMvc.perform(post("/payments/creditcards")
+                        .content(objectMapper.writeValueAsString(ccRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
 }
