@@ -35,7 +35,7 @@ class PaymentControllerTest {
                 .cardHolderName("John Smith")
                 .cardNumber(4311_5678_8987_3456L)
                 .expiresOn(Date.from(Instant.now().plusMillis(10000)))
-                .cvv(123)
+                .cvv("123")
                 .build();
 
         mockMvc.perform(post("/payments/creditcards")
@@ -51,7 +51,7 @@ class PaymentControllerTest {
                 .cardHolderName("John Smith")
                 .cardNumber(4311_5678_8987L)
                 .expiresOn(Date.from(Instant.now()))
-                .cvv(12356)
+                .cvv("12356")
                 .build();
 
         mockMvc.perform(post("/payments/creditcards")
@@ -59,4 +59,20 @@ class PaymentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity());
     }
+
+    @Test
+    void shouldReturnErrorWhenInvokedWithInvalidCvvNumber() throws Exception {
+        CreditCardDetailsRequest ccRequest = CreditCardDetailsRequest.builder()
+                .cardHolderName("John Smith")
+                .cardNumber(4311_5678_8987_3456L)
+                .expiresOn(Date.from(Instant.now().plusMillis(1000)))
+                .cvv("098")
+                .build();
+
+        mockMvc.perform(post("/payments/creditcards")
+                        .content(objectMapper.writeValueAsString(ccRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
 }
