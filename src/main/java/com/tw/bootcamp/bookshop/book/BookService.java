@@ -3,6 +3,7 @@ package com.tw.bootcamp.bookshop.book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,40 +24,40 @@ public class BookService {
         Optional<Book> book = bookRepository.findById(id);
         if(book.isPresent()){
             Book bookDetails = book.get();
-            if (bookDetails.getBooksCount() > 0) {
-                bookDetails.isAvailable(true);
-            } else {
-                bookDetails.isAvailable(false);
-            }
+            bookDetails.isAvailable(bookDetails.getBooksCount() > 0);
             return bookDetails;
         }
         throw new BookNotFoundException();
     }
 
-    public void loadBooks(List<Book> books) {
+    public List<BookInformation> loadBooks(List<BookInformation> books) {
+        List<BookInformation> failedBooks = new ArrayList<>();
         books.forEach(book -> {
             try {
                 Book existingBook = getExistingBook(book);
                 if (existingBook == null) {
                     boolean validIsbn = !(book.getIsbn().isEmpty() && book.getIsbn13().isEmpty());
-                    if (validIsbn) {
-                        bookRepository.save(book);
+                    if (!validIsbn) {
+                        throw new InvalidBookException();
                     }
+                    Book newBook = Book.from(book);
+                    bookRepository.save(newBook);
                 } else {
                     existingBook.update(book);
                     bookRepository.save(existingBook);
                 }
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                failedBooks.add(book);
             }
         });
+        return failedBooks;
     }
 
-    public Book getExistingBook(Book book) {
-        Book existingBook = bookRepository.findByIsbn13(book.getIsbn13());
-        if (existingBook == null) {
-            existingBook = bookRepository.findByIsbn(book.getIsbn());
+    public Book getExistingBook(BookInformation book) {
+        if(!book.getIsbn13().isEmpty()) {
+            return bookRepository.findByIsbn13(book.getIsbn13());
         }
-        return existingBook;
+        return bookRepository.findByIsbn(book.getIsbn());
     }
 
     public List<Book> fetchBooksByTitle(String searchString) {

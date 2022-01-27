@@ -164,14 +164,13 @@ class BookServiceTest {
 
     @Test
     void shouldPersistBooksGivenInCSV() {
-        List<Book> books = new ArrayList<>();
-        Book book = Book.builder()
+        List<BookInformation> books = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
                 .amount(500D)
                 .booksCount(5)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("isbn")
@@ -188,14 +187,13 @@ class BookServiceTest {
 
     @Test
     void shouldUpdateBookCountWhenUploadingBooksWithSameIsbn13() {
-        List<Book> initialBooks = new ArrayList<>();
-        Book book = Book.builder()
+        List<BookInformation> initialBooks = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
                 .amount(500D)
                 .booksCount(5)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("isbn")
@@ -208,14 +206,13 @@ class BookServiceTest {
 
         bookService.loadBooks(initialBooks);
 
-        List<Book> updatedBooks = new ArrayList<>();
-        Book updatedBook = Book.builder()
+        List<BookInformation> updatedBooks = new ArrayList<>();
+        BookInformation updatedBook = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
                 .amount(500D)
                 .booksCount(15)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("isbn")
@@ -233,14 +230,13 @@ class BookServiceTest {
 
     @Test
     void shouldUpdateBookCountWhenUploadingBooksAndIsbn13isMissingAndHasSameIsbn() {
-        List<Book> initialBooks = new ArrayList<>();
-        Book book = Book.builder()
+        List<BookInformation> initialBooks = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
                 .amount(500D)
                 .booksCount(5)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("harrypotter1")
@@ -253,18 +249,17 @@ class BookServiceTest {
 
         bookService.loadBooks(initialBooks);
 
-        List<Book> updatedBooks = new ArrayList<>();
-        Book updatedBook = Book.builder()
+        List<BookInformation> updatedBooks = new ArrayList<>();
+        BookInformation updatedBook = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
                 .amount(500D)
                 .booksCount(15)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("harrypotter1")
-                .isbn13("harrypotter1")
+                .isbn13("")
                 .originalPublicationYear("2013")
                 .originalTitle("Harry Potter Part 1")
                 .languageCode("ENG")
@@ -277,15 +272,57 @@ class BookServiceTest {
     }
 
     @Test
-    void shouldUpdateAllFieldsWhenUploadingBooksWithSameIsbn13() {
-        List<Book> initialBooks = new ArrayList<>();
-        Book book = Book.builder()
+    void shouldAddBookWhenIsbn13isInitiallyMissingAndUpdatedBookHasIsbn13() {
+        List<BookInformation> initialBooks = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
                 .amount(500D)
                 .booksCount(5)
                 .averageRating(4.5)
-                .currency("INR")
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("harrypotter1")
+                .isbn13("")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        initialBooks.add(book);
+
+        bookService.loadBooks(initialBooks);
+
+        List<BookInformation> updatedBooks = new ArrayList<>();
+        BookInformation updatedBook = BookInformation.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(500D)
+                .booksCount(15)
+                .averageRating(4.5)
+                .imageUrl("imageUrl")
+                .smallImageUrl("smallImageUrl")
+                .isbn("harrypotter1")
+                .isbn13("harrypotter123")
+                .originalPublicationYear("2013")
+                .originalTitle("Harry Potter Part 1")
+                .languageCode("ENG")
+                .build();
+        updatedBooks.add(updatedBook);
+
+        bookService.loadBooks(updatedBooks);
+
+        assertNotNull(bookRepository.findByIsbn13("harrypotter123"));
+    }
+
+    @Test
+    void shouldUpdateAllFieldsWhenUploadingBooksWithSameIsbn13() {
+        List<BookInformation> initialBooks = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
+                .name("Harry Potter")
+                .authorName("J K Rowling")
+                .amount(500D)
+                .booksCount(5)
+                .averageRating(4.5)
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("isbn")
@@ -298,14 +335,13 @@ class BookServiceTest {
 
         bookService.loadBooks(initialBooks);
 
-        List<Book> updatedBooks = new ArrayList<>();
-        Book updatedBook = Book.builder()
+        List<BookInformation> updatedBooks = new ArrayList<>();
+        BookInformation updatedBook = BookInformation.builder()
                 .name("Harry_Potter")
                 .authorName("J.K.Rowling")
                 .amount(600D)
                 .booksCount(25)
                 .averageRating(4.7)
-                .currency("INR")
                 .imageUrl("imageUrl1")
                 .smallImageUrl("smallImageUrl1")
                 .isbn("isbn")
@@ -334,14 +370,13 @@ class BookServiceTest {
 
     @Test
     void shouldNotPersistWhenNameIsBlank() {
-        List<Book> books = new ArrayList<>();
-        Book book = Book.builder()
+        List<BookInformation> books = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
                 .name("")
                 .authorName("J K Rowling")
                 .amount(500D)
                 .booksCount(5)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("isbn")
@@ -352,20 +387,20 @@ class BookServiceTest {
                 .build();
         books.add(book);
 
-        bookService.loadBooks(books);
+        List<BookInformation> failedBooks = bookService.loadBooks(books);
+        assertEquals(book, failedBooks.get(0));
         assertNull(bookRepository.findByIsbn13("harrypotter1"));
     }
 
     @Test
     void shouldNotPersistWhenAuthorNameIsBlank() {
-        List<Book> books = new ArrayList<>();
-        Book book = Book.builder()
+        List<BookInformation> books = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("")
                 .amount(500D)
                 .booksCount(5)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("isbn")
@@ -376,20 +411,20 @@ class BookServiceTest {
                 .build();
         books.add(book);
 
-        bookService.loadBooks(books);
+        List<BookInformation> failedBooks = bookService.loadBooks(books);
+        assertEquals(book, failedBooks.get(0));
         assertNull(bookRepository.findByIsbn13("harrypotter1"));
     }
 
     @Test
     void shouldNotPersistWhenPriceIsBlank() {
-        List<Book> books = new ArrayList<>();
-        Book book = Book.builder()
+        List<BookInformation> books = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
                 .amount(null)
                 .booksCount(5)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("isbn")
@@ -400,20 +435,20 @@ class BookServiceTest {
                 .build();
         books.add(book);
 
-        bookService.loadBooks(books);
+        List<BookInformation> failedBooks = bookService.loadBooks(books);
+        assertEquals(book, failedBooks.get(0));
         assertNull(bookRepository.findByIsbn13("harrypotter1"));
     }
 
     @Test
     void shouldNotPersistWhenBookCountIsBlank() {
-        List<Book> books = new ArrayList<>();
-        Book book = Book.builder()
+        List<BookInformation> books = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
                 .amount(600D)
                 .booksCount(null)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("isbn")
@@ -424,20 +459,20 @@ class BookServiceTest {
                 .build();
         books.add(book);
 
-        bookService.loadBooks(books);
+        List<BookInformation> failedBooks = bookService.loadBooks(books);
+        assertEquals(book, failedBooks.get(0));
         assertNull(bookRepository.findByIsbn13("harrypotter1"));
     }
 
     @Test
     void shouldNotPersistWhenBothIsbnAndIsbn13AreBlank() {
-        List<Book> books = new ArrayList<>();
-        Book book = Book.builder()
+        List<BookInformation> books = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
                 .name("Harry Potter")
                 .authorName("J K Rowling")
                 .amount(600D)
                 .booksCount(123)
                 .averageRating(4.5)
-                .currency("INR")
                 .imageUrl("imageUrl")
                 .smallImageUrl("smallImageUrl")
                 .isbn("")
@@ -448,7 +483,8 @@ class BookServiceTest {
                 .build();
         books.add(book);
 
-        bookService.loadBooks(books);
+        List<BookInformation> failedBooks = bookService.loadBooks(books);
+        assertEquals(book, failedBooks.get(0));
         assertNull(bookRepository.findByIsbn13AndIsbn("",""));
     }
 
