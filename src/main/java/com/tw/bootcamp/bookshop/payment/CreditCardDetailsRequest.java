@@ -4,18 +4,18 @@ import com.tw.bootcamp.bookshop.payment.exception.InvalidCreditCardDetailsExcept
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 import java.time.Instant;
 import java.util.Date;
+import java.util.regex.Matcher;
 
 @Getter
 @Builder
 public class CreditCardDetailsRequest {
 
-    private CreditCardDetailsRequest(Long cardNumber, int cvv, Date expiresOn, String cardHolderName) {
+    public static final String VALID_CVV_REGEX = "^[0-9]{3,4}$";
+
+    private CreditCardDetailsRequest(Long cardNumber, String cvv, Date expiresOn, String cardHolderName) {
         this.cardNumber = cardNumber;
         this.cvv = cvv;
         this.expiresOn = expiresOn;
@@ -28,9 +28,8 @@ public class CreditCardDetailsRequest {
     private Long cardNumber;
 
     @NotBlank
-    @Min(value = 100, message = "CVV should be 3 digits")
-    @Max(value = 999, message = "CVV should be 3 digits")
-    private int cvv;
+    @Pattern(regexp = VALID_CVV_REGEX, message = "CVV should be 3 or 4 digits")
+    private String cvv;
 
     @NotBlank
     @Future
@@ -42,12 +41,26 @@ public class CreditCardDetailsRequest {
         return create(request.getCardNumber(), request.getCvv(), request.getExpiresOn(), request.getCardHolderName());
     }
 
-    public static CreditCardDetailsRequest create(Long cardNumber, int cvv, Date expiresOn, String cardHolderName) {
+    public static CreditCardDetailsRequest create(Long cardNumber, String cvv, Date expiresOn, String cardHolderName) {
         if (cardNumber < 1000_0000_0000_0000L || cardNumber > 9999_9999_9999_9999L) throw new InvalidCreditCardDetailsException();
-        if (cvv < 100 || cvv > 999) throw new InvalidCreditCardDetailsException();
+        if (isValidCVVNumber(cvv)) throw new InvalidCreditCardDetailsException();
         if (expiresOn.before(Date.from(Instant.now()))) throw new InvalidCreditCardDetailsException();
 
         return new CreditCardDetailsRequest(cardNumber, cvv, expiresOn, cardHolderName);
+    }
+
+    public static boolean isValidCVVNumber(String str)
+    {
+        // Regex to check valid CVV number.
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(VALID_CVV_REGEX);
+        // If the string is empty
+        // return false
+        if (str == null)
+        {
+            return false;
+        }
+        Matcher m = p.matcher(str);
+        return m.matches();
     }
 
 }
