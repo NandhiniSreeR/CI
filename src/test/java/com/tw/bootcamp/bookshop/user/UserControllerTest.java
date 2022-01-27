@@ -11,7 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
-
 import java.util.Set;
 
 import static com.tw.bootcamp.bookshop.user.UserTestBuilder.buildCreateUserRequest;
@@ -43,8 +42,8 @@ class UserControllerTest {
         UserResponse userResponse = UserResponse.builder().id(user.getId().toString()).email(email).build();
 
         mockMvc.perform(post("/users")
-                .content(objectMapper.writeValueAsString(userCredentials))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(userCredentials))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().string(objectMapper.writeValueAsString(userResponse)));
 
@@ -57,8 +56,8 @@ class UserControllerTest {
         when(userService.create(userCredentials)).thenThrow(new InvalidEmailException());
 
         mockMvc.perform(post("/users")
-                .content(objectMapper.writeValueAsString(userCredentials))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(userCredentials))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("User with same email already created"));
     }
@@ -70,8 +69,8 @@ class UserControllerTest {
         when(userService.create(userCredentials)).thenThrow(new ConstraintViolationException(violations));
 
         mockMvc.perform(post("/users")
-                .content(objectMapper.writeValueAsString(userCredentials))
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(userCredentials))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("Validation failed"))
                 .andExpect(jsonPath("$.errors.email").value("Email is mandatory"));
@@ -98,12 +97,29 @@ class UserControllerTest {
                 .email("nanotest@googl.com")
                 .password("")
                 .build();
-        when(userService.create(userCredentials)).thenThrow(new InvalidPasswordException());
+        when(userService.create(userCredentials)).thenThrow(new PasswordEmptyException());
 
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(userCredentials))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("Password can't be empty"));
+    }
+
+    @Test
+    void shouldRespondWithErrorMessageWhenGivenWeakPassword() throws Exception {
+        CreateUserRequest userCredentials = CreateUserRequest.builder()
+                .email("nanotest@googl.com")
+                .password("password")
+                .build();
+        when(userService.create(userCredentials)).thenThrow(new InvalidPasswordPatternException());
+
+        mockMvc.perform(post("/users")
+                        .content(objectMapper.writeValueAsString(userCredentials))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.message")
+                        .value("Password should be atleast 8 characters with one one special" +
+                                " character and one capital alphabet."));
     }
 }
