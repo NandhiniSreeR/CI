@@ -13,7 +13,11 @@ import java.util.regex.Pattern;
 
 @Service
 public class UserService implements UserDetailsService {
-    public static final String EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+    public static final String EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@"
+            + "[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
+    public static final String PASSWORD_REGEX = "^(?=.*[A-Z])"
+            + "(?=.*[@#$*!%^&+=])"
+            + "(?=\\S+$).{8,}$";
     @Autowired
     private UserRepository userRepository;
 
@@ -23,7 +27,7 @@ public class UserService implements UserDetailsService {
     public UserService() {
     }
 
-    public User create(CreateUserRequest userRequest) throws InvalidEmailException, InvalidEmailPatternException, InvalidPasswordException {
+    public User create(CreateUserRequest userRequest) throws InvalidEmailException, InvalidEmailPatternException, PasswordEmptyException, InvalidPasswordPatternException {
         Optional<User> user = userRepository.findByEmail(userRequest.getEmail());
         if (user.isPresent()) {
             throw new InvalidEmailException();
@@ -36,7 +40,11 @@ public class UserService implements UserDetailsService {
         }
 
         if (userRequest.getPassword().isEmpty()) {
-            throw new InvalidPasswordException();
+            throw new PasswordEmptyException();
+        }
+
+        if (!Pattern.matches(PASSWORD_REGEX, userRequest.getPassword())) {
+            throw new InvalidPasswordPatternException();
         }
         return userRepository.save(newUser);
     }

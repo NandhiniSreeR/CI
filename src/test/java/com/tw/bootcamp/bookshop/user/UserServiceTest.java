@@ -29,7 +29,7 @@ class UserServiceTest {
     private UserService userService = new UserService();
 
     @Test
-    void shouldCreateUserWithValidInputs() throws InvalidEmailException, InvalidEmailPatternException, InvalidPasswordException {
+    void shouldCreateUserWithValidInputs() throws InvalidEmailException, InvalidEmailPatternException, PasswordEmptyException, InvalidPasswordPatternException {
         CreateUserRequest userCredentials = new CreateUserRequestTestBuilder().build();
         User user = new UserTestBuilder().withEmail(userCredentials.getEmail()).build();
         when(userRepository.save(any(User.class))).thenReturn(user);
@@ -87,6 +87,48 @@ class UserServiceTest {
     @Test
     void shouldNotCreateUserWhenEmptyPasswordIsGiven() {
         CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withEmptyPassword().build();
-        assertThrows(InvalidPasswordException.class, () -> userService.create(invalidRequest));
+        assertThrows(PasswordEmptyException.class, () -> userService.create(invalidRequest));
+    }
+
+    @Test
+    void shouldNotCreateUserWhenEmailDoesNotHaveUsername() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withEmptyUsername().build();
+        assertThrows(InvalidEmailPatternException.class, () -> userService.create(invalidRequest));
+    }
+
+    @Test
+    void shouldNotCreateUserWhenEmailDoesNotHaveTLD() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withEmptyTLD().build();
+        assertThrows(InvalidEmailPatternException.class, () -> userService.create(invalidRequest));
+    }
+
+    @Test
+    void shouldNotCreateUserWhenEmailDoesNotHaveExtension() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withEmptyExtension().build();
+        assertThrows(InvalidEmailPatternException.class, () -> userService.create(invalidRequest));
+    }
+
+    @Test
+    void shouldNotCreateUserWhenEmailDoesNotHaveExtensionAndTLD() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withEmptyExtensionAndTLD().build();
+        assertThrows(InvalidEmailPatternException.class, () -> userService.create(invalidRequest));
+    }
+
+    @Test
+    void shouldNotCreateUserWhenPasswordDoesNotHaveAtleastOneCapitalLetter() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withPasswordAllSmall().build();
+        assertThrows(InvalidPasswordPatternException.class, () -> userService.create(invalidRequest));
+    }
+
+    @Test
+    void shouldNotCreateUserWhenPasswordSizeIsLessThan8() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withPasswordSize6().build();
+        assertThrows(InvalidPasswordPatternException.class, () -> userService.create(invalidRequest));
+    }
+
+    @Test
+    void shouldNotCreateUserWhenPasswordDoesNotHaveSpecialCharacter() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withNoSpecialCharacterPassword().build();
+        assertThrows(InvalidPasswordPatternException.class, () -> userService.create(invalidRequest));
     }
 }

@@ -40,7 +40,7 @@ class UserTest {
         CreateUserRequest userRequest = new CreateUserRequestTestBuilder().build();
         User user = User.create(userRequest);
 
-        assertTrue(PASSWORD_ENCODER.matches("foobar", user.getPassword()));
+        assertTrue(PASSWORD_ENCODER.matches("Foo*bart", user.getPassword()));
     }
 
     private Validator constraintsValidator() {

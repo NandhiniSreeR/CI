@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user.address;
 
+import com.tw.bootcamp.bookshop.error.AddressErrorResponse;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserRepository;
 import com.tw.bootcamp.bookshop.user.UserTestBuilder;
@@ -68,12 +69,120 @@ class AddressServiceTest {
         assertEquals(address.getId(), userAddresses.get(0).getId());
     }
 
+    @Test
+    void shouldReturnErrorResponseWhenInvalidCityInInput() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = addressWithInvalidCity();
+
+        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+
+       // Address address = addressService.create(createRequest, user);
+        // ACT
+        // ASSERT
+        assertTrue(errorResponses.hasAnyErrors());
+    }
+
+
+    @Test
+    void shouldReturnTrueWhenAddressIsValid() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = createAddress();
+
+        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+
+        // Address address = addressService.create(createRequest, user);
+        // ACT
+        // ASSERT
+        assertFalse(errorResponses.hasAnyErrors());
+    }
+
+    @Test
+    void shouldReturnErrorResponseWhenInvalidCountryInInput() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = addressWithInvalidCountry();
+
+        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+
+        // Address address = addressService.create(createRequest, user);
+        // ACT
+        // ASSERT
+        assertTrue(errorResponses.hasAnyErrors());
+    }
+
+    @Test
+    void shouldReturnErrorResponseWhenInvalidCountryAndInvalidCityAndInvalidStateInInput() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = addressWithInvalidCountryAndInvalidCityAndInvalidState();
+
+        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+
+        // Address address = addressService.create(createRequest, user);
+        // ACT
+        // ASSERT
+        assertTrue(errorResponses.hasAnyErrors());
+        assertEquals(3,errorResponses.countOfErrors());
+
+    }
+
+    @Test
+    void shouldReturnErrorResponseWhenInvalidPincodeInInput() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = addressWithInvalidPincode();
+
+        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+
+        // Address address = addressService.create(createRequest, user);
+        // ACT
+        // ASSERT
+        assertTrue(errorResponses.hasAnyErrors());
+    }
+
+    private CreateAddressRequest addressWithInvalidPincode() {
+        return CreateAddressRequest.builder()
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("Bangalore")
+                .pinCode("A22+001")
+                .country("India")
+                .state("Karnataka")
+                .build();
+    }
+
+    private CreateAddressRequest addressWithInvalidCountryAndInvalidCityAndInvalidState() {
+        return CreateAddressRequest.builder()
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("12345667")
+                .pinCode("A22001")
+                .country("123456")
+                .state("123")
+                .build();
+    }
+
+
+    private CreateAddressRequest addressWithInvalidCountry() {
+        return CreateAddressRequest.builder()
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("Pune")
+                .pinCode("A22001")
+                .country("123456")
+                .build();
+    }
+
+
+
     private CreateAddressRequest invalidAddress() {
         return CreateAddressRequest.builder()
                 .lineNoOne("4 Privet Drive")
                 .lineNoTwo("Little Whinging")
                 .city(null)
-                .pinCode("A22 001")
+                .pinCode("A22001")
                 .country("Surrey")
                 .build();
     }
@@ -83,7 +192,17 @@ class AddressServiceTest {
                 .lineNoOne("4 Privet Drive")
                 .lineNoTwo("Little Whinging")
                 .city("Godstone")
-                .pinCode("A22 001")
+                .pinCode("A22001")
+                .country("Surrey")
+                .build();
+    }
+
+    private CreateAddressRequest addressWithInvalidCity() {
+        return CreateAddressRequest.builder()
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("123")
+                .pinCode("A22001")
                 .country("Surrey")
                 .build();
     }
