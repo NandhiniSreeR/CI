@@ -65,10 +65,8 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.id").value(111L));
     }
 
-    //TODO : Book count = 0 : decrementing to -1
     //TODO : Address id does not belong to customer id : currently accepting, should not
     //TODO : Address id does not exist in system : throwing exception instead of error
-    //TODO : Book id does not exist in system : modify error message
 
     private CreateOrderRequest createOrder() {
         return CreateOrderRequest.builder()

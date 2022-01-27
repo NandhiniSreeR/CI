@@ -2,6 +2,7 @@ package com.tw.bootcamp.bookshop.user.order;
 
 import com.tw.bootcamp.bookshop.book.Book;
 import com.tw.bootcamp.bookshop.book.error.RequiredBookQuantityNotAvailableException;
+import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeZeroException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,7 +23,7 @@ class OrderServiceTest {
     private OrderService orderService;
 
     @Test
-    void createOrderAndVerifyIfInventoryIsReduced() throws RequiredBookQuantityNotAvailableException{
+    void createOrderAndVerifyIfInventoryIsReduced() throws RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeZeroException {
         Book purchasedBook = Book.builder()
                 .id(2222L)
                 .isbn13("book2222isbn13")
@@ -42,7 +43,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void createOrderForBookWithQuantityGreaterThanInventoryCount() {
+    void shouldThrowErrorWhenCreatingOrderWithQuantityGreaterThanInventoryCount() {
         Book purchasedBook = Book.builder()
                 .id(2222L)
                 .isbn13("book2222isbn13")
@@ -58,5 +59,24 @@ class OrderServiceTest {
         RequiredBookQuantityNotAvailableException requiredBookQuantityNotAvailableException = assertThrows(RequiredBookQuantityNotAvailableException.class,
                 () -> orderService.create(orderToCreate));
         assertEquals("Required book quantity is not available in the system", requiredBookQuantityNotAvailableException.getMessage());
+    }
+
+    @Test
+    void shouldThrowErrorWhenCreatingOrderWithZeroQuantity() {
+        Book purchasedBook = Book.builder()
+                .id(2222L)
+                .isbn13("book2222isbn13")
+                .booksCount(10)
+                .build();
+        Order orderToCreate = Order.builder()
+                .id(111L)
+                .quantity(0)
+                .paymentMode(PaymentMode.CASH_ON_DELIVERY.toString())
+                .bookToPurchase(purchasedBook)
+                .build();
+
+        OrderQuantityCannotBeZeroException orderQuantityCannotBeZeroException = assertThrows(OrderQuantityCannotBeZeroException.class,
+                () -> orderService.create(orderToCreate));
+        assertEquals("Order quantity cannot be Zero", orderQuantityCannotBeZeroException.getMessage());
     }
 }
