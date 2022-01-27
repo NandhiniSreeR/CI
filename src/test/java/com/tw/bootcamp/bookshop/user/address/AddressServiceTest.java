@@ -62,7 +62,7 @@ class AddressServiceTest {
         CreateAddressRequest createRequest = createAddress();
         Address address = addressService.create(createRequest, user);
         // ACT
-        List<Address> userAddresses =  addressService.loadAddressFromUserName(user);
+        List<Address> userAddresses =  addressService.loadAddressForUser(user);
         // ASSERT
         assertEquals(1, userAddresses.size());
         assertEquals(address.getId(), userAddresses.get(0).getId());

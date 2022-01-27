@@ -75,30 +75,19 @@ class AddressControllerTest {
     }
 
     @Test
-    void shouldReturnAddressesForUserWhenEmailExists() throws Exception {
+    void shouldReturnAddressesWhenAddressAvailableForLoggedInUser() throws Exception {
         User user = new UserTestBuilder().build();
         when(userService.findByEmail(anyString())).thenReturn(Optional.of(user));
 
         Address address = new AddressTestBuilder().build();
         List<Address> addresses = Collections.singletonList(address);
-        when(addressService.loadAddressFromUserName(user)).thenReturn(addresses);
+        when(addressService.loadAddressForUser(user)).thenReturn(addresses);
 
         mockMvc.perform(get("/addresses/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$[0]").exists())
                 .andExpect(jsonPath("$[0].city").value(address.getCity()));
-    }
-
-    @Test
-    void shouldFailToReturnAddressesForUserWhenEmailDoesNotExist() throws Exception{
-        when(userService.findByEmail(anyString())).thenReturn(Optional.empty());
-        List<Address> addresses = Collections.singletonList(new AddressTestBuilder().build());
-        when(addressService.loadAddressFromUserName(any(User.class))).thenReturn(addresses);
-
-        mockMvc.perform(get("/addresses/"))
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.message").value("User email does not exist"));
     }
 
     //TODO : Modify address response to remove user details

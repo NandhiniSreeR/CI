@@ -18,7 +18,7 @@ public class AddressService {
         return addressRepository.save(address);
     }
 
-    public List<Address> loadAddressFromUserName(User user) {
+    public List<Address> loadAddressForUser(User user) {
         return addressRepository.findAllByUser(user);
     }
 

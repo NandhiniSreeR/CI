@@ -44,9 +44,9 @@ public class AddressController {
             description = "Addresses returned", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = Address.class))})}
     )
-    public ResponseEntity<List<Address>> findByUserEmail(Principal principal) {
+    public ResponseEntity<List<Address>> fetchAddressForLoggedInUser(Principal principal) {
         User user = userService.findByEmail(principal.getName()).orElseThrow(EmailDoesNotExistException::new);
-        List<Address> addresses = addressService.loadAddressFromUserName(user);
+        List<Address> addresses = addressService.loadAddressForUser(user);
         return new ResponseEntity<>(addresses, HttpStatus.OK);
     }
 }
