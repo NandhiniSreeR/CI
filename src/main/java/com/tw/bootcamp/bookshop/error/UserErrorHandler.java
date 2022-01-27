@@ -6,8 +6,6 @@ import com.tw.bootcamp.bookshop.user.InvalidEmailException;
 import com.tw.bootcamp.bookshop.user.InvalidEmailPatternException;
 import com.tw.bootcamp.bookshop.user.InvalidPasswordPatternException;
 import com.tw.bootcamp.bookshop.user.PasswordEmptyException;
-import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeZeroException;
-import com.tw.bootcamp.bookshop.user.InvalidPasswordException;
 import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeLessThanOneException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
