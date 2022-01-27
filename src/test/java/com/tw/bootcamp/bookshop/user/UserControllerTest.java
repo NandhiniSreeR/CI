@@ -76,4 +76,34 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("Validation failed"))
                 .andExpect(jsonPath("$.errors.email").value("Email is mandatory"));
     }
+
+    @Test
+    void shouldRespondWithErrorMessageWhenGivenInvalidEmail() throws Exception {
+        CreateUserRequest userCredentials = CreateUserRequest.builder()
+                .email("nanotestgoogl.com")
+                .password("password")
+                .build();
+        when(userService.create(userCredentials)).thenThrow(new InvalidEmailPatternException());
+
+        mockMvc.perform(post("/users")
+                        .content(objectMapper.writeValueAsString(userCredentials))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.message").value("Email should follow the pattern abc@xyz.com"));
+    }
+
+    @Test
+    void shouldRespondWithErrorMessageWhenGivenEmptyPassword() throws Exception {
+        CreateUserRequest userCredentials = CreateUserRequest.builder()
+                .email("nanotest@googl.com")
+                .password("")
+                .build();
+        when(userService.create(userCredentials)).thenThrow(new InvalidPasswordException());
+
+        mockMvc.perform(post("/users")
+                        .content(objectMapper.writeValueAsString(userCredentials))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.message").value("Password can't be empty"));
+    }
 }

@@ -29,7 +29,7 @@ class UserServiceTest {
     private UserService userService = new UserService();
 
     @Test
-    void shouldCreateUserWithValidInputs() throws InvalidEmailException {
+    void shouldCreateUserWithValidInputs() throws InvalidEmailException, InvalidEmailPatternException, InvalidPasswordException {
         CreateUserRequest userCredentials = new CreateUserRequestTestBuilder().build();
         User user = new UserTestBuilder().withEmail(userCredentials.getEmail()).build();
         when(userRepository.save(any(User.class))).thenReturn(user);
@@ -76,5 +76,17 @@ class UserServiceTest {
         String invalidEmailId = "testemail@test";
         when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
         assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername(invalidEmailId));
+    }
+
+    @Test
+    void shouldNotCreateUserWhenEmailPatternDoesNotMatch() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withInvalidEmail().build();
+        assertThrows(InvalidEmailPatternException.class, () -> userService.create(invalidRequest));
+    }
+
+    @Test
+    void shouldNotCreateUserWhenEmptyPasswordIsGiven() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withEmptyPassword().build();
+        assertThrows(InvalidPasswordException.class, () -> userService.create(invalidRequest));
     }
 }

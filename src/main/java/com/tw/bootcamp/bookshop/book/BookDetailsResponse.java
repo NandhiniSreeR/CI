@@ -21,6 +21,6 @@ public class BookDetailsResponse {
     private String imageUrl;
     @Schema(example = "www.Smallimage.jpg", description = "Small Image Url of the Book")
     private String smallImageUrl;
-    @Schema(example = "True", description = "Is book Available or not")
+    @Schema(example = "True", description = "Indicates whether book is available in the inventory")
     private boolean isAvailable;
 }

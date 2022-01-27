@@ -68,7 +68,7 @@ class BookControllerTest {
         books.add(book);
         when(bookService.fetchBooksByTitle("Harry")).thenReturn(books);
 
-        mockMvc.perform(get("/books")
+        mockMvc.perform(get("/books/search")
                         .param("title","Harry")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -81,7 +81,7 @@ class BookControllerTest {
         List<Book> books = new ArrayList<>();
         when(bookService.fetchBooksByTitle("Animal")).thenReturn(books);
 
-        mockMvc.perform(get("/books")
+        mockMvc.perform(get("/books/search")
                         .param("title","Animal")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -146,11 +146,11 @@ class BookControllerTest {
                         .file(file))
                 .andExpect(status().isOk());
 
-        ArgumentCaptor<List<Book>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<BookInformation>> argumentCaptor = ArgumentCaptor.forClass(List.class);
 
         then(bookService).should().loadBooks(argumentCaptor.capture());
-        List<Book> capturedBooks = argumentCaptor.getValue();
-        Book firstCapturedBook = capturedBooks.get(0);
+        List<BookInformation> capturedBooks = argumentCaptor.getValue();
+        BookInformation firstCapturedBook = capturedBooks.get(0);
 
         assertEquals(firstBook.getName(), firstCapturedBook.getName());
         assertEquals(firstBook.getAuthorName(), firstCapturedBook.getAuthorName());
@@ -170,7 +170,6 @@ class BookControllerTest {
             uploadStream.close();
         }
     }
-
 
     @Test
     void shouldReturnBookDetailsWhenBookIdIsValid() throws Exception {
@@ -197,5 +196,68 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.message").
                         value("Book details not found for the book id"));
         verify(bookService, times(1)).fetchByBookId(INVALID_BOOK_ID);
+    }
+
+    @Test
+    void shouldReturnFailedBooksWhenUploadedCSVHasInvalidBooks() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Invalid Book List.csv");
+        MockMultipartFile file = new MockMultipartFile("file", "Invalid Book List.csv", "text/csv", uploadStream);
+
+        List<BookInformation> failedBooks = new ArrayList<>();
+        BookInformation book = BookInformation.builder()
+                .id(52L)
+                .name("")
+                .authorName("Stephenie Meyer")
+                .amount(2335D)
+                .booksCount(185)
+                .averageRating(3.69)
+                .imageUrl("https://images.gr-assets.com/books/1361038355m/428263.jpg")
+                .smallImageUrl("https://images.gr-assets.com/books/1361038355s/428263.jpg")
+                .isbn("316160202")
+                .isbn13("harry")
+                .originalPublicationYear("2007")
+                .originalTitle("Eclipse")
+                .languageCode("en-US")
+                .build();
+        failedBooks.add(book);
+        when(bookService.loadBooks(any())).thenReturn(failedBooks);
+
+        MvcResult result = this.mockMvc.perform(multipart("/admin/load-books")
+                .file(file))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<BookInformation> actual = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<BookInformation>>() {});
+
+        assertEquals(book.getId(), actual.get(0).getId());
+
+        if (uploadStream != null) {
+            uploadStream.close();
+        }
+    }
+
+    @Test
+    void shouldNotReturnBooksWhenUploadedCSVHasValidBooks() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
+        MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
+
+        when(bookService.loadBooks(any())).thenReturn(Collections.emptyList());
+
+        MvcResult result = this.mockMvc.perform(multipart("/admin/load-books")
+                        .file(file))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<BookInformation> actual = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<BookInformation>>() {});
+
+        assertEquals(0, actual.size());
+
+        if (uploadStream != null) {
+            uploadStream.close();
+        }
     }
 }

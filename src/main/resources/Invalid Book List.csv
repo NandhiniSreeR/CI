@@ -1,0 +1,3 @@
+id,author,title,image_url,small_image_url,price,books_count,isbn,isbn13,original_publication_year,original_title,language_code,average_rating
+51,Cassandra Clare,"City of Jones (The Mortal Instruments, #1)",https://images.gr-assets.com/books/1432730315m/256683.jpg,https://images.gr-assets.com/books/1432730315s/256683.jpg,1461,178,1416914285,9781416914280,2007,City of Bones,eng,4.12
+52,Stephenie Meyer,,https://images.gr-assets.com/books/1361038355m/428263.jpg,https://images.gr-assets.com/books/1361038355s/428263.jpg,2335,185,316160202,harry,2007,Eclipse,en-US,3.69

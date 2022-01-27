@@ -32,9 +32,11 @@ public class BookController {
 
 
     @GetMapping("/books")
-    @Operation(summary = "List all books", description = "Lists all books in bookshop", tags = {"Books Service"})
+    @Operation(summary = "List all books", description = "To list all the books in the bookshop with a book image. " +
+            "The result will be sorted in an ascending order based on the Book title.", tags = {"Books Service"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List all books",
+            @ApiResponse(responseCode = "200", description = "To list all the books in the bookshop with a book image. " +
+                    "The result will be sorted in an ascending order based on the Book title.",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = BookResponse.class))})
     })
@@ -45,12 +47,16 @@ public class BookController {
                 .collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "/books", params = "title")
+    @GetMapping(value = "/books/search", params = "title")
     @Operation(summary = "Search books by title",
-            description = "Case insensitive search on books by title that will be ordered in ascending",
+            description = "To list all the books in the bookshop based on the title search. " +
+                    "The result will be sorted in an ascending order based on the Book title. " +
+                    "The search is Case insensitive on books title.",
             tags = {"Books Service"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Search books by title",
+            @ApiResponse(responseCode = "200", description = "To list all the books in the bookshop based on the title search. " +
+                    "The result will be sorted in an ascending order based on the Book title. " +
+                    "The search is Case insensitive on books title.",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = BookResponse.class))})
     })
@@ -61,39 +67,41 @@ public class BookController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping(value = "/admin/load-books",consumes = "multipart/form-data")
-    @Operation(summary = "Load all books from CSV file", description = "Load all books from CSV file in inventory", tags = {"Books Service"})
+    @PostMapping(value = "/admin/load-books", consumes = "multipart/form-data")
+    @Operation(summary = "Load books from CSV file", description = "Loads all valid books from the uploaded CSV. Invalid books are returned as a response. " +
+            "Invalid book referes to empty values for title, author_name, price, book_count. " +
+            "If both ISBN and ISBN13 are empty, it is considered as an invalid book", tags = {"Books Service"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Books are loaded in Inventory",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ResponseEntity.class))})
     })
-    public ResponseEntity<?> loadBooks(@Parameter(description = "A CSV file with book details") @RequestParam ("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> loadBooks(@Parameter(description = "A CSV file with book details") @RequestParam("file") MultipartFile file) throws IOException {
         if (file == null || file.getContentType() == null || !file.getContentType().equals("text/csv")) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        List<Book> books = csvToBooks(file.getInputStream());
-        bookService.loadBooks(books);
-        return new ResponseEntity<>(HttpStatus.OK);
+        List<BookInformation> books = csvToBooks(file.getInputStream());
+        List<BookInformation> failedBooks = bookService.loadBooks(books);
+        return new ResponseEntity<>(failedBooks, HttpStatus.OK);
     }
 
     @GetMapping("/books/{id}")
-    @Operation(summary = "Show book details", description = "Show details of a book in bookshop", tags = {"Books Service"})
+    @Operation(summary = "Show details of a book", description = "Show details of a book in bookshop based on the unique identifier", tags = {"Books Service"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Show book details",
+            @ApiResponse(responseCode = "200", description = "Show details of a book in bookshop based on the unique identifier",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = BookDetailsResponse.class))}),
             @ApiResponse(responseCode = "404", content = @Content)
     })
-    BookDetailsResponse fetch(@Parameter(description = "Unique identifier of the book" , example = "1") @PathVariable Long id) throws BookNotFoundException {
+    BookDetailsResponse fetch(@Parameter(description = "Unique identifier of the book", example = "1") @PathVariable Long id) throws BookNotFoundException {
         Book book = bookService.fetchByBookId(id);
         return book.toBookDetailsResponse();
     }
 
-    private List<Book> csvToBooks(InputStream csvInputStream) {
+    private List<BookInformation> csvToBooks(InputStream csvInputStream) {
         Reader reader = new InputStreamReader(csvInputStream);
         return new CsvToBeanBuilder(reader)
-                .withType(Book.class)
+                .withType(BookInformation.class)
                 .build()
                 .parse();
     }
