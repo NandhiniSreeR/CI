@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Validator;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 public class UserService implements UserDetailsService {
+    public static final String EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
     @Autowired
     private UserRepository userRepository;
 
@@ -21,13 +23,21 @@ public class UserService implements UserDetailsService {
     public UserService() {
     }
 
-    public User create(CreateUserRequest userRequest) throws InvalidEmailException {
+    public User create(CreateUserRequest userRequest) throws InvalidEmailException, InvalidEmailPatternException, InvalidPasswordException {
         Optional<User> user = userRepository.findByEmail(userRequest.getEmail());
         if (user.isPresent()) {
             throw new InvalidEmailException();
         }
         User newUser = User.create(userRequest);
         validator.validate(newUser);
+
+        if (!Pattern.matches(EMAIL_REGEX, userRequest.getEmail())) {
+            throw new InvalidEmailPatternException();
+        }
+
+        if (userRequest.getPassword().isEmpty()) {
+            throw new InvalidPasswordException();
+        }
         return userRepository.save(newUser);
     }
 

@@ -17,7 +17,8 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    @Operation(summary = "Create user", description = "Creates user with credentials", tags = {"User Service"})
+    @Operation(summary = "Create user", description = "Creates user with valid credentials. Password and Email cannot be empty." +
+            "Email must follow the standard email pattern. eg. abc@xyz.com", tags = {"User Service"})
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "201", description = "User created",
@@ -27,7 +28,7 @@ public class UserController {
                     @ApiResponse(responseCode = "422", content = @Content)
             }
     )
-    ResponseEntity<UserResponse> create(@RequestBody CreateUserRequest userRequest) throws InvalidEmailException {
+    ResponseEntity<UserResponse> create(@RequestBody CreateUserRequest userRequest) throws InvalidEmailException, InvalidEmailPatternException, InvalidPasswordException {
         User user = userService.create(userRequest);
         return new ResponseEntity<>(new UserResponse(user), HttpStatus.CREATED);
     }

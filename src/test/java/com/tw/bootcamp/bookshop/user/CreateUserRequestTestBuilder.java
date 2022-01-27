@@ -22,4 +22,9 @@ public class CreateUserRequestTestBuilder {
         requestBuilder.password("");
         return this;
     }
+
+    public CreateUserRequestTestBuilder withInvalidEmail() {
+        requestBuilder.email("nanotestgoogle.com");
+        return this;
+    }
 }
