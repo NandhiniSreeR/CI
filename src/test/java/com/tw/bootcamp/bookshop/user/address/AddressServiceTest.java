@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user.address;
 
+import com.tw.bootcamp.bookshop.error.AddressErrorResponse;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserRepository;
 import com.tw.bootcamp.bookshop.user.UserTestBuilder;
@@ -68,6 +69,18 @@ class AddressServiceTest {
         assertEquals(address.getId(), userAddresses.get(0).getId());
     }
 
+    @Test
+    void shouldReturnErrorResponseWhenInvalidCityInInput() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = addressWithInvalidCity();
+        Address address = addressService.create(createRequest, user);
+        // ACT
+        AddressErrorResponse errorResponses =  addressService.validate(address);
+        // ASSERT
+        assertEquals(1, errorResponses.getErrors().size());
+    }
+
     private CreateAddressRequest invalidAddress() {
         return CreateAddressRequest.builder()
                 .lineNoOne("4 Privet Drive")
@@ -83,6 +96,16 @@ class AddressServiceTest {
                 .lineNoOne("4 Privet Drive")
                 .lineNoTwo("Little Whinging")
                 .city("Godstone")
+                .pinCode("A22 001")
+                .country("Surrey")
+                .build();
+    }
+
+    private CreateAddressRequest addressWithInvalidCity() {
+        return CreateAddressRequest.builder()
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("123")
                 .pinCode("A22 001")
                 .country("Surrey")
                 .build();

@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user.address;
 
+import com.tw.bootcamp.bookshop.error.AddressErrorResponse;
 import com.tw.bootcamp.bookshop.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,9 @@ public class AddressService {
 
     public Optional<Address> loadAddressById(Long addressId){
         return addressRepository.findById(addressId);
+    }
+
+    public AddressErrorResponse validate(Address address) {
+        return null;
     }
 }
