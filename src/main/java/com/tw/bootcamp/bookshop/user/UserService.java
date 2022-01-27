@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user;
 
+import com.tw.bootcamp.bookshop.error.EmailDoesNotExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,5 +63,15 @@ public class UserService implements UserDetailsService {
                 user.getPassword(),
                 AuthorityUtils.createAuthorityList(user.getRole().authority())
         );
+    }
+
+    public User updateRole(User user) {
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+        if (!existingUser.isPresent()) {
+            throw new EmailDoesNotExistException();
+        }
+        existingUser.get().setRole(user.getRole());
+        userRepository.save(existingUser.get());
+        return existingUser.get();
     }
 }

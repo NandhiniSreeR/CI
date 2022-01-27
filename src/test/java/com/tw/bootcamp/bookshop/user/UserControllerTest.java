@@ -1,6 +1,8 @@
 package com.tw.bootcamp.bookshop.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tw.bootcamp.bookshop.error.EmailDoesNotExistException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,7 +17,9 @@ import java.util.Set;
 
 import static com.tw.bootcamp.bookshop.user.UserTestBuilder.buildCreateUserRequest;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
@@ -42,8 +46,8 @@ class UserControllerTest {
         UserResponse userResponse = UserResponse.builder().id(user.getId().toString()).email(email).build();
 
         mockMvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(userCredentials))
-                        .contentType(MediaType.APPLICATION_JSON))
+                .content(objectMapper.writeValueAsString(userCredentials))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().string(objectMapper.writeValueAsString(userResponse)));
 
@@ -56,8 +60,8 @@ class UserControllerTest {
         when(userService.create(userCredentials)).thenThrow(new InvalidEmailException());
 
         mockMvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(userCredentials))
-                        .contentType(MediaType.APPLICATION_JSON))
+                .content(objectMapper.writeValueAsString(userCredentials))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("User with same email already created"));
     }
@@ -69,8 +73,8 @@ class UserControllerTest {
         when(userService.create(userCredentials)).thenThrow(new ConstraintViolationException(violations));
 
         mockMvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(userCredentials))
-                        .contentType(MediaType.APPLICATION_JSON))
+                .content(objectMapper.writeValueAsString(userCredentials))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.message").value("Validation failed"))
                 .andExpect(jsonPath("$.errors.email").value("Email is mandatory"));
@@ -121,5 +125,37 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.message")
                         .value("Password should be atleast 8 characters with one one special" +
                                 " character and one capital alphabet."));
+    }
+
+    @Test
+    void shouldNotUpdateUserRoleToAdminWhenUserIsNotPresent() throws Exception {
+        User user = new User("john@books.com", Role.ADMIN);
+        when(userService.updateRole(any())).thenThrow(new EmailDoesNotExistException());
+
+        mockMvc.perform(put("/admin/role")
+                        .content(objectMapper.writeValueAsString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                .with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void shouldUpdateUserRoleToAdminWhenAdminUpdates() throws Exception {
+        User user = new User("john@books.com", Role.ADMIN);
+        mockMvc.perform(put("/admin/role")
+                        .content(objectMapper.writeValueAsString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldNotUpdateUserRoleToAdminWhenUserUpdates() throws Exception {
+        User user = new User("john@books.com", Role.ADMIN);
+        mockMvc.perform(put("/admin/role")
+                        .content(objectMapper.writeValueAsString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user("user@bookshopify.com").password("user").roles(Role.USER.name())))
+                .andExpect(status().isForbidden());
     }
 }

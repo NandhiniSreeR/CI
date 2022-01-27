@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user;
 
+import com.tw.bootcamp.bookshop.error.EmailDoesNotExistException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -137,4 +138,20 @@ class UserServiceTest {
         CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withNoSpecialCharacterPassword().build();
         assertThrows(InvalidPasswordPatternException.class, () -> userService.create(invalidRequest));
     }
+
+    @Test
+    void shouldReturnUpdatedUserWhenAdminChangesTheRole(){
+        User nonAdminUser = new User("nonadmin@bookshopify.com", Role.USER);
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(nonAdminUser));
+        assertEquals(nonAdminUser.getRole(), userService.updateRole(nonAdminUser).getRole());
+        assertEquals(nonAdminUser.getEmail(), userService.updateRole(nonAdminUser).getEmail());
+    }
+    @Test
+    void shouldThrowEmailNotFoundExceptionWhenUserIsNotPresent(){
+        User nonAdminUser = new User("nonadmin@bookshopify.com", Role.USER);
+        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
+        assertThrows(EmailDoesNotExistException.class, () -> userService.updateRole(nonAdminUser));
+    }
+
+
 }
