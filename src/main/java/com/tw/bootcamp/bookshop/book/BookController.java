@@ -1,6 +1,7 @@
 package com.tw.bootcamp.bookshop.book;
 
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.tw.bootcamp.bookshop.book.error.BookNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,4 +1,4 @@
-package com.tw.bootcamp.bookshop.book;
+package com.tw.bootcamp.bookshop.book.error;
 
 public class BookNotFoundException extends Exception {
     public BookNotFoundException() {

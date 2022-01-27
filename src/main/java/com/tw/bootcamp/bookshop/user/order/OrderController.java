@@ -1,8 +1,9 @@
 package com.tw.bootcamp.bookshop.user.order;
 
 import com.tw.bootcamp.bookshop.book.Book;
-import com.tw.bootcamp.bookshop.book.BookNotFoundException;
+import com.tw.bootcamp.bookshop.book.error.BookNotFoundException;
 import com.tw.bootcamp.bookshop.book.BookService;
+import com.tw.bootcamp.bookshop.book.error.RequiredBookQuantityNotAvailableException;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserService;
 import com.tw.bootcamp.bookshop.user.address.Address;
@@ -43,7 +44,7 @@ public class OrderController {
             description = "Order created", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = ResponseEntity.class))})}
     )
-    public ResponseEntity<OrderResponse> create(@RequestBody CreateOrderRequest createRequest, Principal principal) throws BookNotFoundException {
+    public ResponseEntity<OrderResponse> create(@RequestBody CreateOrderRequest createRequest, Principal principal) throws BookNotFoundException, RequiredBookQuantityNotAvailableException {
         User user = userService.findByEmail(principal.getName()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         Address address = addressService.loadAddressById(createRequest.getAddressId()).orElseThrow(() -> new RuntimeException("Address not found"));
         Book book = bookService.fetchByBookId(createRequest.getBookId());

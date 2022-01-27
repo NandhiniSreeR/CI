@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.book;
 
+import com.tw.bootcamp.bookshop.book.error.BookNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

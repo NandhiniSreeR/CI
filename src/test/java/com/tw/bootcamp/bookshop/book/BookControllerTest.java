@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.book;
 
+import com.tw.bootcamp.bookshop.book.error.BookNotFoundException;
 import com.tw.bootcamp.bookshop.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
