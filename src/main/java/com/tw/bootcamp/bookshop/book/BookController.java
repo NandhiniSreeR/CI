@@ -61,7 +61,9 @@ public class BookController {
     }
 
     @PostMapping(value = "/admin/load-books", consumes = "multipart/form-data")
-    @Operation(summary = "Load all books from CSV file", description = "Load all books from CSV file in inventory", tags = {"Books Service"})
+    @Operation(summary = "Load books from CSV file", description = "Loads all valid books from the uploaded CSV. Invalid books are returned as a response. " +
+            "Invalid book referes to empty values for title, author_name, price, book_count. " +
+            "If both ISBN and ISBN13 are empty, it is considered as an invalid book", tags = {"Books Service"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Books are loaded in Inventory",
                     content = {@Content(mediaType = "application/json",
