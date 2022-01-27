@@ -4,4 +4,8 @@ public class InvalidCreditCardDetailsException extends RuntimeException {
     public InvalidCreditCardDetailsException() {
         super("Invalid Credit Card Details");
     }
+
+    public InvalidCreditCardDetailsException(String message) {
+        super(message);
+    }
 }

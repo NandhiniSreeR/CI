@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping("/payments")
 public class PaymentController {
@@ -21,7 +23,7 @@ public class PaymentController {
             description = "Payment Successful", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = PaymentResponse.class))})}
     )
-    public ResponseEntity<PaymentResponse> makeCreditCardPayment(@RequestBody CreditCardDetailsRequest ccRequest) {
+    public ResponseEntity<PaymentResponse> makeCreditCardPayment(@RequestBody CreditCardDetailsRequest ccRequest) throws ParseException {
         CreditCardDetailsRequest.validate(ccRequest);
         PaymentResponse response = PaymentResponse.builder().status(true).build();
         return ResponseEntity.ok(response);

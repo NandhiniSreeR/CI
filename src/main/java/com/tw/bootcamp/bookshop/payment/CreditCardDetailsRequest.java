@@ -4,7 +4,12 @@ import com.tw.bootcamp.bookshop.payment.exception.InvalidCreditCardDetailsExcept
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -14,8 +19,9 @@ import java.util.regex.Matcher;
 public class CreditCardDetailsRequest {
 
     public static final String VALID_CVV_REGEX = "^[0-9]{3,4}$";
+    public static final String VALID_EXPIRY_REGEX = "(?:0[1-9]|1[0-2])/[0-9]{4}";
 
-    private CreditCardDetailsRequest(Long cardNumber, String cvv, Date expiresOn, String cardHolderName) {
+    private CreditCardDetailsRequest(Long cardNumber, String cvv, String expiresOn, String cardHolderName) {
         this.cardNumber = cardNumber;
         this.cvv = cvv;
         this.expiresOn = expiresOn;
@@ -32,21 +38,30 @@ public class CreditCardDetailsRequest {
     private String cvv;
 
     @NotBlank
-    @Future
-    private Date expiresOn;
+    @Pattern(regexp = VALID_EXPIRY_REGEX, message = "Expiry date format should be MM/YYYY")
+    private String expiresOn;
 
     private String cardHolderName;
 
-    public static CreditCardDetailsRequest validate(CreditCardDetailsRequest request) {
+    public static CreditCardDetailsRequest validate(CreditCardDetailsRequest request) throws ParseException {
         return create(request.getCardNumber(), request.getCvv(), request.getExpiresOn(), request.getCardHolderName());
     }
 
-    public static CreditCardDetailsRequest create(Long cardNumber, String cvv, Date expiresOn, String cardHolderName) {
-        if (cardNumber < 1000_0000_0000_0000L || cardNumber > 9999_9999_9999_9999L) throw new InvalidCreditCardDetailsException();
-        if (isValidCVVNumber(cvv)) throw new InvalidCreditCardDetailsException();
-        if (expiresOn.before(Date.from(Instant.now()))) throw new InvalidCreditCardDetailsException();
+    public static CreditCardDetailsRequest create(Long cardNumber, String cvv, String expiresOn, String cardHolderName) throws ParseException {
+        Date expiryDate = formatAsDate(expiresOn);
+        System.out.println("expiryDate = " + expiryDate);
+        if (cardNumber < 1000_0000_0000_0000L || cardNumber > 9999_9999_9999_9999L) throw new InvalidCreditCardDetailsException("Invalid Credit Card Number");
+        if (!isValidCVVNumber(cvv)) throw new InvalidCreditCardDetailsException("Invalid CVV");
+        if (expiryDate.before(Date.from(Instant.now()))) throw new InvalidCreditCardDetailsException("Invalid Expiry Date");
 
         return new CreditCardDetailsRequest(cardNumber, cvv, expiresOn, cardHolderName);
+    }
+
+    private static Date formatAsDate(String expiresOn) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
+        dateFormat.setLenient(false);
+        Date expiryDate = dateFormat.parse(expiresOn);
+        return expiryDate;
     }
 
     public static boolean isValidCVVNumber(String str)
