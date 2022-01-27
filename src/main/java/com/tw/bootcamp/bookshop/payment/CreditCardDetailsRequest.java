@@ -44,8 +44,8 @@ public class CreditCardDetailsRequest {
 
     private String cardHolderName;
 
-    public static CreditCardDetailsRequest validate(CreditCardDetailsRequest request) throws ParseException {
-        return create(request.getCardNumber(), request.getCvv(), request.getExpiresOn(), request.getCardHolderName());
+    public static void validate(CreditCardDetailsRequest request) throws ParseException {
+        create(request.getCardNumber(), request.getCvv(), request.getExpiresOn(), request.getCardHolderName());
     }
 
     public static CreditCardDetailsRequest create(Long cardNumber, String cvv, String expiresOn, String cardHolderName) throws ParseException {
