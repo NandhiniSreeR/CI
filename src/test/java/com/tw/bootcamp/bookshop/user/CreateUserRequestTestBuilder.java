@@ -62,4 +62,9 @@ public class CreateUserRequestTestBuilder {
         requestBuilder.password("Password");
         return this;
     }
+
+    public CreateUserRequestTestBuilder withNoDotEmail() {
+        requestBuilder.email("test@twcom");
+        return this;
+    }
 }

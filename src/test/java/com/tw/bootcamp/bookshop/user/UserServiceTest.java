@@ -103,6 +103,12 @@ class UserServiceTest {
     }
 
     @Test
+    void shouldNotCreateUserWhenEmailTLDDoesNotContainDot() {
+        CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withNoDotEmail().build();
+        assertThrows(InvalidEmailPatternException.class, () -> userService.create(invalidRequest));
+    }
+
+    @Test
     void shouldNotCreateUserWhenEmailDoesNotHaveExtension() {
         CreateUserRequest invalidRequest = new CreateUserRequestTestBuilder().withEmptyExtension().build();
         assertThrows(InvalidEmailPatternException.class, () -> userService.create(invalidRequest));
