@@ -37,8 +37,8 @@ public class BookService {
             try {
                 Book existingBook = getExistingBook(book);
                 if (existingBook == null) {
-                    boolean validIsbn = !(book.getIsbn().isEmpty() && book.getIsbn13().isEmpty());
-                    if (!validIsbn) {
+                    boolean invalidIsbn = book.getIsbn().isEmpty() && book.getIsbn13().isEmpty();
+                    if (invalidIsbn) {
                         throw new InvalidBookException();
                     }
                     Book newBook = Book.from(book);
