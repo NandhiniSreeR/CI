@@ -90,8 +90,20 @@ class AddressControllerTest {
                 .andExpect(jsonPath("$[0].city").value(address.getCity()));
     }
 
-    //TODO : Modify address response to remove user details
-    //TODO : Default user implementation : within scope?
+    @Test
+    void shouldNotReturnUserDetailsWhenAddressDetailsAreRequested() throws Exception {
+        User user = new UserTestBuilder().build();
+        when(userService.findByEmail(anyString())).thenReturn(Optional.of(user));
+
+        Address address = new AddressTestBuilder().withUser(user).build();
+        List<Address> addresses = Collections.singletonList(address);
+        when(addressService.loadAddressForUser(user)).thenReturn(addresses);
+
+        mockMvc.perform(get("/addresses/"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$[0].user").doesNotExist());
+    }
 
     private CreateAddressRequest createAddress() {
         return CreateAddressRequest.builder()

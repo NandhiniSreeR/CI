@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user.address;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tw.bootcamp.bookshop.user.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -40,6 +41,7 @@ public class Address {
     @Schema(example = "true", description = "User's default shipping address")
     private boolean isDefault;
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
