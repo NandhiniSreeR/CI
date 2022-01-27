@@ -51,13 +51,12 @@ class OrderControllerTest {
         when(userService.findByEmail(anyString())).thenReturn(Optional.of(new UserTestBuilder().build()));
         when(addressService.loadAddressById(anyLong())).thenReturn(Optional.of(new AddressTestBuilder().build()));
         when(bookService.fetchByBookId(anyLong())).thenReturn(new BookTestBuilder().build());
-        Order returnedOrder = Order.builder()
+        Order order = Order.builder()
                 .id(111L)
-                                    .quantity(1)
-                                    .paymentMode(PaymentMode.CASH_ON_DELIVERY.toString())
-
+                .quantity(1)
+                .paymentMode(PaymentMode.CASH_ON_DELIVERY.toString())
                 .build();
-        when(orderService.create(any(Order.class))).thenReturn(returnedOrder);
+        when(orderService.create(any(Order.class))).thenReturn(order);
         mockMvc.perform(post("/orders")
                         .content(objectMapper.writeValueAsString(createRequest))
                         .contentType(MediaType.APPLICATION_JSON))
