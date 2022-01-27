@@ -44,7 +44,7 @@ public class BookController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping(value = "/books", params = "title")
+    @GetMapping(value = "/books/search", params = "title")
     @Operation(summary = "Search books by title",
             description = "Case insensitive search on books by title that will be ordered in ascending",
             tags = {"Books Service"})

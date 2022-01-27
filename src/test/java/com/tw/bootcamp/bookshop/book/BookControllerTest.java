@@ -67,7 +67,7 @@ class BookControllerTest {
         books.add(book);
         when(bookService.fetchBooksByTitle("Harry")).thenReturn(books);
 
-        mockMvc.perform(get("/books")
+        mockMvc.perform(get("/books/search")
                         .param("title","Harry")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -80,7 +80,7 @@ class BookControllerTest {
         List<Book> books = new ArrayList<>();
         when(bookService.fetchBooksByTitle("Animal")).thenReturn(books);
 
-        mockMvc.perform(get("/books")
+        mockMvc.perform(get("/books/search")
                         .param("title","Animal")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
