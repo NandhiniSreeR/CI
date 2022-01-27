@@ -76,7 +76,7 @@ public class BookController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/book/{id}")
+    @GetMapping("/books/{id}")
     @Operation(summary = "Show book details", description = "Show details of a book in bookshop", tags = {"Books Service"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Show book details",

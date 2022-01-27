@@ -178,7 +178,7 @@ class BookControllerTest {
 
         when(bookService.fetchByBookId(BOOK_ID)).thenReturn(book);
 
-        mockMvc.perform(get("/book/56")
+        mockMvc.perform(get("/books/56")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Harry Potter"));
@@ -190,7 +190,7 @@ class BookControllerTest {
         long INVALID_BOOK_ID = 0L;
         when(bookService.fetchByBookId(INVALID_BOOK_ID)).thenThrow(new BookNotFoundException());
 
-        mockMvc.perform(get("/book/" + INVALID_BOOK_ID)
+        mockMvc.perform(get("/books/" + INVALID_BOOK_ID)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").
