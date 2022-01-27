@@ -20,6 +20,7 @@ public class CreditCardDetailsRequest {
 
     public static final String VALID_CVV_REGEX = "^[0-9]{3,4}$";
     public static final String VALID_EXPIRY_REGEX = "(?:0[1-9]|1[0-2])/[0-9]{4}";
+    public static final String EXPIRY_DATE_FORMAT = "MM/yyyy";
 
     private CreditCardDetailsRequest(Long cardNumber, String cvv, String expiresOn, String cardHolderName) {
         this.cardNumber = cardNumber;
@@ -58,18 +59,16 @@ public class CreditCardDetailsRequest {
     }
 
     private static Date formatAsDate(String expiresOn) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(EXPIRY_DATE_FORMAT);
         dateFormat.setLenient(false);
-        Date expiryDate = dateFormat.parse(expiresOn);
-        return expiryDate;
+        return dateFormat.parse(expiresOn);
     }
 
     public static boolean isValidCVVNumber(String str)
     {
         // Regex to check valid CVV number.
         java.util.regex.Pattern p = java.util.regex.Pattern.compile(VALID_CVV_REGEX);
-        // If the string is empty
-        // return false
+        // If the string is empty return false
         if (str == null)
         {
             return false;
