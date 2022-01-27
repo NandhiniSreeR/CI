@@ -1,5 +1,7 @@
 package com.tw.bootcamp.bookshop.book;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tw.bootcamp.bookshop.book.error.BookNotFoundException;
 import com.tw.bootcamp.bookshop.user.UserService;
 import org.junit.jupiter.api.Test;
@@ -11,9 +13,11 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
