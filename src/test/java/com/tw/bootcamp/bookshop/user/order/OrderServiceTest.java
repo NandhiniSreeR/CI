@@ -77,7 +77,7 @@ class OrderServiceTest {
 
         OrderQuantityCannotBeLessThanOneException orderQuantityCannotBeLessThanOneException = assertThrows(OrderQuantityCannotBeLessThanOneException.class,
                 () -> orderService.create(orderToCreate));
-        assertEquals("Order quantity cannot be Zero", orderQuantityCannotBeLessThanOneException.getMessage());
+        assertEquals("Order quantity cannot be less than one", orderQuantityCannotBeLessThanOneException.getMessage());
     }
 
     @Test
