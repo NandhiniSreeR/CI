@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user;
 
+import com.tw.bootcamp.bookshop.error.EmailDoesNotExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,8 +14,8 @@ import java.util.regex.Pattern;
 
 @Service
 public class UserService implements UserDetailsService {
-    public static final String EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@"
-            + "[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
+    public static final String EMAIL_REGEX = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
+            + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     public static final String PASSWORD_REGEX = "^(?=.*[A-Z])"
             + "(?=.*[@#$*!%^&+=])"
             + "(?=\\S+$).{8,}$";
@@ -62,5 +63,15 @@ public class UserService implements UserDetailsService {
                 user.getPassword(),
                 AuthorityUtils.createAuthorityList(user.getRole().authority())
         );
+    }
+
+    public User updateRole(User user) {
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+        if (!existingUser.isPresent()) {
+            throw new EmailDoesNotExistException();
+        }
+        existingUser.get().setRole(user.getRole());
+        userRepository.save(existingUser.get());
+        return existingUser.get();
     }
 }

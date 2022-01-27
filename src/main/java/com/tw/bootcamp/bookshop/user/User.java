@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +32,7 @@ public class User {
     private String email;
     @NotBlank(message = "Password is mandatory")
     @Schema(example = "password", description = "password of user")
+    @JsonIgnore
     private String password;
     @Schema(example = "USER", description = "Role assigned to user")
     @Enumerated(EnumType.STRING)
@@ -40,9 +42,18 @@ public class User {
     /*@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Address> addresses;*/
 
-    private User(String email, String password, Role role) {
+    User(String email, String password, Role role) {
         this.email = email;
         this.password = password;
+        this.role = role;
+    }
+
+    public User(String email, Role role) {
+        this.email = email;
+        this.role = role;
+    }
+
+    public void setRole(Role role) {
         this.role = role;
     }
 

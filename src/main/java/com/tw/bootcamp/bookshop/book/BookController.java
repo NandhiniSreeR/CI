@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -68,6 +69,7 @@ public class BookController {
     }
 
     @PostMapping(value = "/admin/load-books", consumes = "multipart/form-data")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Load books from CSV file", description = "Loads all valid books from the uploaded CSV. Invalid books are returned as a response. " +
             "Invalid book refers to empty values for title, author_name, price, book_count. " +
             "If both ISBN and ISBN13 are empty, or title, author_name, price, book_count are empty then the book is considered invalid.", tags = {"Books Service"})

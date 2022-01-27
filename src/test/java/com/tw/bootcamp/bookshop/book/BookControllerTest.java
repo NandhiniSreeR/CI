@@ -3,6 +3,7 @@ package com.tw.bootcamp.bookshop.book;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tw.bootcamp.bookshop.book.error.BookNotFoundException;
+import com.tw.bootcamp.bookshop.user.Role;
 import com.tw.bootcamp.bookshop.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -23,6 +24,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -99,7 +101,7 @@ class BookControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
 
         this.mockMvc.perform(multipart("/admin/load-books")
-                        .file(file))
+                        .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isOk());
         if (uploadStream != null) {
             uploadStream.close();
@@ -112,7 +114,7 @@ class BookControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "Book List.txt", "text/plain", uploadStream);
 
         this.mockMvc.perform(multipart("/admin/load-books")
-                        .file(file))
+                        .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isBadRequest());
         if (uploadStream != null) {
             uploadStream.close();
@@ -120,8 +122,21 @@ class BookControllerTest {
     }
 
     @Test
+    void shouldNotUploadWhenNonAdminTriedToUploadTheBooks() throws Exception {
+        InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
+        MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
+
+        this.mockMvc.perform(multipart("/admin/load-books")
+                        .file(file).with(user("user@bookshopify.com").password("user").roles(Role.USER.name())))
+                .andExpect(status().isForbidden());
+        if (uploadStream != null) {
+            uploadStream.close();
+        }
+    }
+
+    @Test
     void shouldReturnBadRequestWhenFileIsMissing() throws Exception {
-        this.mockMvc.perform(multipart("/admin/load-books"))
+        this.mockMvc.perform(multipart("/admin/load-books").with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isBadRequest());
     }
 
@@ -147,7 +162,7 @@ class BookControllerTest {
                 .build();
 
         this.mockMvc.perform(multipart("/admin/load-books")
-                        .file(file))
+                        .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isOk());
 
         ArgumentCaptor<List<BookInformation>> argumentCaptor = ArgumentCaptor.forClass(List.class);
@@ -227,7 +242,7 @@ class BookControllerTest {
         when(bookService.loadBooks(any())).thenReturn(failedBooks);
 
         MvcResult result = this.mockMvc.perform(multipart("/admin/load-books")
-                .file(file))
+                        .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -250,7 +265,7 @@ class BookControllerTest {
         when(bookService.loadBooks(any())).thenReturn(Collections.emptyList());
 
         MvcResult result = this.mockMvc.perform(multipart("/admin/load-books")
-                        .file(file))
+                        .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isOk())
                 .andReturn();
 
