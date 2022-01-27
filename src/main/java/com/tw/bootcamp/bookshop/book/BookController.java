@@ -31,9 +31,11 @@ public class BookController {
 
 
     @GetMapping("/books")
-    @Operation(summary = "List all books", description = "Lists all books in bookshop", tags = {"Books Service"})
+    @Operation(summary = "List all books", description = "To list all the books in the bookshop with a book image. " +
+            "The result will be sorted in an ascending order based on the Book title.", tags = {"Books Service"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List all books",
+            @ApiResponse(responseCode = "200", description = "To list all the books in the bookshop with a book image. " +
+                    "The result will be sorted in an ascending order based on the Book title.",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = BookResponse.class))})
     })
@@ -46,10 +48,14 @@ public class BookController {
 
     @GetMapping(value = "/books/search", params = "title")
     @Operation(summary = "Search books by title",
-            description = "Case insensitive search on books by title that will be ordered in ascending",
+            description = "To list all the books in the bookshop based on the title search. " +
+                    "The result will be sorted in an ascending order based on the Book title. " +
+                    "The search is Case insensitive on books title.",
             tags = {"Books Service"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Search books by title",
+            @ApiResponse(responseCode = "200", description = "To list all the books in the bookshop based on the title search. " +
+                    "The result will be sorted in an ascending order based on the Book title. " +
+                    "The search is Case insensitive on books title.",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = BookResponse.class))})
     })
@@ -79,9 +85,9 @@ public class BookController {
     }
 
     @GetMapping("/books/{id}")
-    @Operation(summary = "Show book details", description = "Show details of a book in bookshop", tags = {"Books Service"})
+    @Operation(summary = "Show details of a book", description = "Show details of a book in bookshop based on the unique identifier", tags = {"Books Service"})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Show book details",
+            @ApiResponse(responseCode = "200", description = "Show details of a book in bookshop based on the unique identifier",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = BookDetailsResponse.class))}),
             @ApiResponse(responseCode = "404", content = @Content)
