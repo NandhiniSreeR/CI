@@ -113,10 +113,10 @@ class AddressServiceTest {
     }
 
     @Test
-    void shouldReturnErrorResponseWhenInvalidCountryAndInvalidCityInInput() {
+    void shouldReturnErrorResponseWhenInvalidCountryAndInvalidCityAndInvalidStateInInput() {
         // ARRANGE
         User user = userRepository.save(new UserTestBuilder().build());
-        CreateAddressRequest createRequest = addressWithInvalidCountryAndInvalidCity();
+        CreateAddressRequest createRequest = addressWithInvalidCountryAndInvalidCityAndInvalidState();
 
         AddressErrorResponse errorResponses =  addressService.validate(createRequest);
 
@@ -124,17 +124,43 @@ class AddressServiceTest {
         // ACT
         // ASSERT
         assertTrue(errorResponses.hasAnyErrors());
-        assertEquals(2,errorResponses.countOfErrors());
+        assertEquals(3,errorResponses.countOfErrors());
 
     }
 
-    private CreateAddressRequest addressWithInvalidCountryAndInvalidCity() {
+    @Test
+    void shouldReturnErrorResponseWhenInvalidPincodeInInput() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = addressWithInvalidPincode();
+
+        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+
+        // Address address = addressService.create(createRequest, user);
+        // ACT
+        // ASSERT
+        assertTrue(errorResponses.hasAnyErrors());
+    }
+
+    private CreateAddressRequest addressWithInvalidPincode() {
+        return CreateAddressRequest.builder()
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("Bangalore")
+                .pinCode("A22+001")
+                .country("India")
+                .state("Karnataka")
+                .build();
+    }
+
+    private CreateAddressRequest addressWithInvalidCountryAndInvalidCityAndInvalidState() {
         return CreateAddressRequest.builder()
                 .lineNoOne("4 Privet Drive")
                 .lineNoTwo("Little Whinging")
                 .city("12345667")
-                .pinCode("A22 001")
+                .pinCode("A22001")
                 .country("123456")
+                .state("123")
                 .build();
     }
 
@@ -144,7 +170,7 @@ class AddressServiceTest {
                 .lineNoOne("4 Privet Drive")
                 .lineNoTwo("Little Whinging")
                 .city("Pune")
-                .pinCode("A22 001")
+                .pinCode("A22001")
                 .country("123456")
                 .build();
     }
@@ -156,7 +182,7 @@ class AddressServiceTest {
                 .lineNoOne("4 Privet Drive")
                 .lineNoTwo("Little Whinging")
                 .city(null)
-                .pinCode("A22 001")
+                .pinCode("A22001")
                 .country("Surrey")
                 .build();
     }
@@ -166,7 +192,7 @@ class AddressServiceTest {
                 .lineNoOne("4 Privet Drive")
                 .lineNoTwo("Little Whinging")
                 .city("Godstone")
-                .pinCode("122001")
+                .pinCode("A22001")
                 .country("Surrey")
                 .build();
     }
@@ -176,7 +202,7 @@ class AddressServiceTest {
                 .lineNoOne("4 Privet Drive")
                 .lineNoTwo("Little Whinging")
                 .city("123")
-                .pinCode("A22 001")
+                .pinCode("A22001")
                 .country("Surrey")
                 .build();
     }
