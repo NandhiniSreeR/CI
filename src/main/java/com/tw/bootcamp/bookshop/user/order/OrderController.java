@@ -37,11 +37,11 @@ public class OrderController {
 
     @PostMapping
     @Operation(summary = "Create a new order for the logged in user",
-            description = "Creates an order for user with details such as book details, payment mode, user address",
+            description = "Creates an order for user with details such as book details, payment mode, user address and quantity",
             tags = {"Order Service"})
     @ApiResponses(value = {@ApiResponse(responseCode = "201",
             description = "Order created", content = {@Content(mediaType = "application/json",
-            schema = @Schema(implementation = ResponseEntity.class))})}
+            schema = @Schema(implementation = OrderResponse.class))})}
     )
     public ResponseEntity<OrderResponse> create(@RequestBody CreateOrderRequest createRequest, Principal principal) throws BookNotFoundException {
         User user = userService.findByEmail(principal.getName()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
