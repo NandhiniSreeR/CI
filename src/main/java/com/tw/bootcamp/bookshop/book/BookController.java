@@ -60,20 +60,20 @@ public class BookController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping(value = "/admin/load-books",consumes = "multipart/form-data")
+    @PostMapping(value = "/admin/load-books", consumes = "multipart/form-data")
     @Operation(summary = "Load all books from CSV file", description = "Load all books from CSV file in inventory", tags = {"Books Service"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Books are loaded in Inventory",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ResponseEntity.class))})
     })
-    public ResponseEntity<?> loadBooks(@Parameter(description = "A CSV file with book details") @RequestParam ("file") MultipartFile file) throws IOException {
+    public ResponseEntity<?> loadBooks(@Parameter(description = "A CSV file with book details") @RequestParam("file") MultipartFile file) throws IOException {
         if (file == null || file.getContentType() == null || !file.getContentType().equals("text/csv")) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        List<Book> books = csvToBooks(file.getInputStream());
-        bookService.loadBooks(books);
-        return new ResponseEntity<>(HttpStatus.OK);
+        List<BookInformation> books = csvToBooks(file.getInputStream());
+        List<BookInformation> failedBooks = bookService.loadBooks(books);
+        return new ResponseEntity<>(failedBooks, HttpStatus.OK);
     }
 
     @GetMapping("/books/{id}")
@@ -84,15 +84,15 @@ public class BookController {
                             schema = @Schema(implementation = BookDetailsResponse.class))}),
             @ApiResponse(responseCode = "404", content = @Content)
     })
-    BookDetailsResponse fetch(@Parameter(description = "Unique identifier of the book" , example = "1") @PathVariable Long id) throws BookNotFoundException {
+    BookDetailsResponse fetch(@Parameter(description = "Unique identifier of the book", example = "1") @PathVariable Long id) throws BookNotFoundException {
         Book book = bookService.fetchByBookId(id);
         return book.toBookDetailsResponse();
     }
 
-    private List<Book> csvToBooks(InputStream csvInputStream) {
+    private List<BookInformation> csvToBooks(InputStream csvInputStream) {
         Reader reader = new InputStreamReader(csvInputStream);
         return new CsvToBeanBuilder(reader)
-                .withType(Book.class)
+                .withType(BookInformation.class)
                 .build()
                 .parse();
     }

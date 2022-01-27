@@ -1,6 +1,5 @@
 package com.tw.bootcamp.bookshop.book;
 
-import com.opencsv.bean.CsvBindByName;
 import com.tw.bootcamp.bookshop.money.Money;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -21,46 +20,52 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(example = "1", description = "Unique Identifier of the Book")
     private Long id;
-    @CsvBindByName(column = "title")
     @NotBlank
     @Schema(example = "Harry Potter", description = "Name of the Book")
     private String name;
-    @CsvBindByName(column = "author")
     @NotBlank
     @Schema(example = "J.K. Rowling", description = "Author of the Book")
     private String authorName;
-    @CsvBindByName(column = "price")
     @Column(columnDefinition = "NUMERIC")
     @NotNull
     @Schema(example = "1000", description = "Price of the Book")
     private Double amount;
     private String currency = "INR";
-    @CsvBindByName(column = "image_url")
     @Schema(example = "www.image.jpg", description = "Image Url of the Book")
     private String imageUrl;
-    @CsvBindByName(column = "small_image_url")
     @Schema(example = "www.Smallimage.jpg", description = "Small Image Url of the Book")
     private String smallImageUrl;
     @Column(columnDefinition = "NUMERIC")
-    @CsvBindByName(column = "books_count")
     @NotNull
     private Integer booksCount;
-    @CsvBindByName(column = "isbn13")
     private String isbn13;
-    @CsvBindByName(column = "isbn")
     private String isbn;
-    @CsvBindByName(column = "original_publication_year")
     private String originalPublicationYear;
-    @CsvBindByName(column = "original_title")
     private String originalTitle;
-    @CsvBindByName(column = "language_code")
     private String languageCode;
     @Column(columnDefinition = "NUMERIC")
-    @CsvBindByName(column = "average_rating")
     private Double averageRating;
     @Transient
     @Schema(example = "True", description = "Is book Available or not")
     private boolean isAvailable;
+
+    public static Book from(BookInformation book) {
+        return Book.builder()
+                .authorName(book.getAuthorName())
+                .name(book.getName())
+                .amount(book.getAmount())
+                .currency("INR")
+                .booksCount(book.getBooksCount())
+                .imageUrl(book.getImageUrl())
+                .smallImageUrl(book.getSmallImageUrl())
+                .isbn13(book.getIsbn13())
+                .isbn(book.getIsbn())
+                .originalPublicationYear(book.getOriginalPublicationYear())
+                .originalTitle(book.getOriginalTitle())
+                .languageCode(builder().languageCode)
+                .averageRating(book.getAverageRating())
+                .build();
+    }
 
     public BookResponse toResponse() {
         return BookResponse.builder()
@@ -85,18 +90,17 @@ public class Book {
                 .build();
     }
 
-    public void update(Book book) {
-        this.authorName = book.authorName;
-        this.name = book.name;
-        this.amount = book.amount;
-        this.currency = book.currency;
-        this.booksCount = book.booksCount + this.booksCount;
-        this.originalPublicationYear = book.originalPublicationYear;
-        this.imageUrl = book.imageUrl;
-        this.smallImageUrl = book.smallImageUrl;
-        this.languageCode = book.languageCode;
-        this.originalTitle = book.originalTitle;
-        this.averageRating = book.averageRating;
+    public void update(BookInformation book) {
+        this.authorName = book.getAuthorName();
+        this.name = book.getName();
+        this.amount = book.getAmount();
+        this.booksCount = book.getBooksCount() + this.booksCount;
+        this.originalPublicationYear = book.getOriginalPublicationYear();
+        this.imageUrl = book.getImageUrl();
+        this.smallImageUrl = book.getSmallImageUrl();
+        this.languageCode = book.getLanguageCode();
+        this.originalTitle = book.getOriginalTitle();
+        this.averageRating = book.getAverageRating();
     }
 
     public void isAvailable(boolean isAvailable) {
