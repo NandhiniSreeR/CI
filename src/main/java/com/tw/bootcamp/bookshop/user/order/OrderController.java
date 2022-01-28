@@ -49,7 +49,7 @@ public class OrderController {
     )
     public ResponseEntity<OrderResponse> create(@RequestBody CreateOrderRequest createRequest, Principal principal) throws BookNotFoundException, RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException, InvalidPaymentModeException {
         User user = userService.findByEmail(principal.getName()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Address address = addressService.loadAddressById(createRequest.getAddressId()).orElseThrow(() -> new RuntimeException("Address not found"));
+        Address address = addressService.loadAddressById(createRequest.getAddressId()).orElseThrow(() -> new AddressNotFoundForCustomerException());
         Book book = bookService.fetchByBookId(createRequest.getBookId());
         Order orderToCreate = Order.create(createRequest, user, address, book);
         Order order = orderService.create(orderToCreate);
