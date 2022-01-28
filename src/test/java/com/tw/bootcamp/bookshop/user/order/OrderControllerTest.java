@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tw.bootcamp.bookshop.book.Book;
 import com.tw.bootcamp.bookshop.book.BookService;
 import com.tw.bootcamp.bookshop.book.BookTestBuilder;
-import com.tw.bootcamp.bookshop.user.Role;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserService;
 import com.tw.bootcamp.bookshop.user.UserTestBuilder;
@@ -19,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
@@ -93,6 +93,16 @@ class OrderControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].orderNumber").value(firstOrder.getId()))
                 .andExpect(jsonPath("$[1].orderNumber").value(secondOrder.getId()));
+    }
+
+    @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    void shouldReturnEmptyListWhenNoOrdersPlaced() throws Exception {
+        when(orderService.findAllOrdersForAdmin()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/admin/orders"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     private Order createOrder(Long id) {

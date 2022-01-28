@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -152,5 +153,13 @@ class OrderServiceTest {
         InvalidPaymentModeException invalidPaymentModeException = assertThrows(InvalidPaymentModeException.class,
                 () -> orderService.create(orderToCreate));
         assertEquals("Payment mode is invalid.", invalidPaymentModeException.getMessage());
+    }
+
+    @Test
+    void findAllOrderForAdmin() {
+        List<Order> orders = new ArrayList<>();
+        when(orderRepository.findAll()).thenReturn(orders);
+        List<Order> actual = orderService.findAllOrdersForAdmin();
+        assertEquals(orders, actual);
     }
 }
