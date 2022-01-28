@@ -142,6 +142,30 @@ class AddressServiceTest {
         assertTrue(errorResponses.hasAnyErrors());
     }
 
+    @Test
+    void shouldCreateAddressWhenValidNameAndMobileNoAreInput() {
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = createAddressWithNameAndMobileNo();
+
+        Address address = addressService.create(createRequest, user);
+
+        assertNotNull(address);
+        assertEquals("4 Privet Drive", address.getLineNoOne());
+        assertEquals(user.getId(), address.getUser().getId());
+    }
+
+    private CreateAddressRequest createAddressWithNameAndMobileNo() {
+        return CreateAddressRequest.builder()
+                .fullName("Mr. X")
+                .mobileNumber(9876543210L)
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("Godstone")
+                .pinCode("A22001")
+                .country("Surrey")
+                .build();
+    }
+
     private CreateAddressRequest addressWithInvalidPincode() {
         return CreateAddressRequest.builder()
                 .lineNoOne("4 Privet Drive")
