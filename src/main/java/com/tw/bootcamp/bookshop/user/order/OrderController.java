@@ -9,6 +9,7 @@ import com.tw.bootcamp.bookshop.user.UserService;
 import com.tw.bootcamp.bookshop.user.address.Address;
 import com.tw.bootcamp.bookshop.user.address.AddressService;
 import com.tw.bootcamp.bookshop.user.order.error.AddressNotFoundForCustomerException;
+import com.tw.bootcamp.bookshop.user.order.error.InvalidDateFormatException;
 import com.tw.bootcamp.bookshop.user.order.error.InvalidPaymentModeException;
 import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeLessThanOneException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,17 +21,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
 public class OrderController {
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private OrderService orderService;
     @Autowired
@@ -66,8 +69,23 @@ public class OrderController {
             description = "Orders returned", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = AdminOrderResponse.class))})}
     )
-    public ResponseEntity<List<AdminOrderResponse>> findAllOrders() {
-        List<Order> orders = orderService.findAllOrdersForAdmin();
+    public ResponseEntity<List<AdminOrderResponse>> findAllOrders(@RequestParam(required = false, name = "startDate") Optional<String> maybeStartDate,
+                                                                  @RequestParam(required = false, name = "endDate") Optional<String> maybeEndDate) {
+        List<Order> orders;
+        if (maybeStartDate.isPresent() || maybeEndDate.isPresent()) {
+            Optional<Date> startDate;
+            Optional<Date> endDate;
+            try {
+                startDate = maybeStartDate.isPresent() ? Optional.of(dateFormat.parse(maybeStartDate.get())) : Optional.empty();
+                endDate = maybeEndDate.isPresent() ? Optional.of(dateFormat.parse(maybeEndDate.get())) : Optional.empty();
+            } catch (ParseException e) {
+                throw new InvalidDateFormatException("Please enter date in format 'yyyy-MM-dd' e.g. '2020-08-10' ");
+            }
+            orders = orderService.findAllOrdersForAdmin(startDate, endDate);
+        } else {
+            orders = orderService.findAllOrdersForAdmin();
+        }
+
         List<AdminOrderResponse> adminOrderResponses = orders.stream()
                 .map(Order::toAdminOrderResponse)
                 .collect(Collectors.toList());
