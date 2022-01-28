@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user;
 
+import com.tw.bootcamp.bookshop.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class UserController {
@@ -40,13 +44,18 @@ public class UserController {
             value = {
                     @ApiResponse(responseCode = "200", description = "Role Updated Successfully",
                             content = {@Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = UserResponse.class))}),
-                    @ApiResponse(responseCode = "400", content = @Content),
-                    @ApiResponse(responseCode = "422", content = @Content)
+                                    schema = @Schema(implementation = RoleUpdateResponse.class))}),
+                    @ApiResponse(responseCode = "400", description = "Request body has invalid params",
+                            content = {@Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class))}),
+                    @ApiResponse(responseCode = "422", description = "When a unprocessable entity is passed in the body",
+                            content = {@Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class))})
             }
     )
-    ResponseEntity<User> updateRole(@RequestBody User user) {
-        return new ResponseEntity<>(userService.updateRole(user), HttpStatus.OK);
+    ResponseEntity updateRole(@RequestBody User user) {
+        userService.updateRole(user);
+        return ResponseEntity.status(HttpStatus.OK).body(new RoleUpdateResponse(user.getEmail(), user.getRole(), "Role Updated Successfully"));
     }
 
 }

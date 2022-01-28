@@ -1,6 +1,5 @@
 package com.tw.bootcamp.bookshop.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tw.bootcamp.bookshop.error.EmailDoesNotExistException;
 import org.junit.jupiter.api.Test;
@@ -157,5 +156,26 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(user("user@bookshopify.com").password("user").roles(Role.USER.name())))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldFailWhenInvalidEmailAddressIsPassed() throws Exception {
+        User user = new User("john", Role.ADMIN);
+        when(userService.updateRole(any())).thenThrow(new EmailDoesNotExistException());
+
+        mockMvc.perform(put("/admin/role")
+                        .content(objectMapper.writeValueAsString(user))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void shouldFailWhenInvalidRolesIsPassed() throws Exception {
+        mockMvc.perform(put("/admin/role")
+                        .content(objectMapper.writeValueAsString("{ 'email':'test@test.com', 'role':'DUMMY'} "))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
+                .andExpect(status().isBadRequest());
     }
 }
