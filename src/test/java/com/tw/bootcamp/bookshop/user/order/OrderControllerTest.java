@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tw.bootcamp.bookshop.book.Book;
 import com.tw.bootcamp.bookshop.book.BookService;
 import com.tw.bootcamp.bookshop.book.BookTestBuilder;
-import com.tw.bootcamp.bookshop.book.error.RequiredBookQuantityNotAvailableException;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserService;
 import com.tw.bootcamp.bookshop.user.UserTestBuilder;
@@ -24,7 +23,7 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(OrderController.class)
 @WithMockUser
 class OrderControllerTest {
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private MockMvc mockMvc;
 
@@ -121,6 +121,55 @@ class OrderControllerTest {
         mockMvc.perform(get("/admin/orders"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    void shouldReturnFilteredListOfOrdersBetweenStartDateAndEndDate() throws Exception {
+        Order secondOrder = createOrder(222L);
+        String endDateStr = "2020-08-11";
+        String startDateStr = "2020-08-10";
+        Date startDate = dateFormat.parse(startDateStr);
+        Date endDate = dateFormat.parse(endDateStr);
+
+        when(orderService.findAllOrdersForAdmin(Optional.of(startDate), Optional.of(endDate)))
+                .thenReturn(Collections.singletonList(secondOrder));
+
+        mockMvc.perform(get("/admin/orders?startDate="+startDateStr+"&endDate="+endDateStr))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].orderNumber").value(secondOrder.getId()));
+
+        verify(orderService).findAllOrdersForAdmin(Optional.of(startDate), Optional.of(endDate));
+    }
+
+    @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    void shouldReturnFilteredListOfOrdersBetweenStartDateAndCurrentDate() throws Exception {
+        Order secondOrder = createOrder(222L);
+        String startDateStr = "2020-08-10";
+        Date startDate = dateFormat.parse(startDateStr);
+        when(orderService.findAllOrdersForAdmin(Optional.of(startDate), Optional.empty())).thenReturn(Collections.singletonList(secondOrder));
+
+        mockMvc.perform(get("/admin/orders?startDate="+startDateStr))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].orderNumber").value(secondOrder.getId()));
+
+        verify(orderService).findAllOrdersForAdmin(Optional.of(startDate), Optional.empty());
+    }
+
+    @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    void shouldReturnFilteredListOfOrdersUntilEndDate() throws Exception {
+        Order secondOrder = createOrder(222L);
+        String endDateStr = "2020-08-10";
+        Date endDate = dateFormat.parse(endDateStr);
+        when(orderService.findAllOrdersForAdmin(Optional.empty(), Optional.of(endDate))).thenReturn(Collections.singletonList(secondOrder));
+
+        mockMvc.perform(get("/admin/orders?endDate="+endDateStr))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].orderNumber").value(secondOrder.getId()));
+
+        verify(orderService).findAllOrdersForAdmin(Optional.empty(), Optional.of(endDate));
     }
 
     private Order createOrder(Long id) {
