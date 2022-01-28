@@ -6,6 +6,7 @@ import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.address.Address;
 import com.tw.bootcamp.bookshop.user.address.AddressRepository;
 import com.tw.bootcamp.bookshop.user.order.error.AddressNotFoundForCustomerException;
+import com.tw.bootcamp.bookshop.user.order.error.InvalidPaymentModeException;
 import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeLessThanOneException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,7 @@ class OrderServiceTest {
     private AddressRepository addressRepository;
 
     @Test
-    void createOrderAndVerifyIfInventoryIsReduced() throws RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException {
+    void createOrderAndVerifyIfInventoryIsReduced() throws RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException, InvalidPaymentModeException {
         Book purchasedBook = Book.builder()
                 .id(2222L)
                 .isbn13("book2222isbn13")
@@ -137,5 +138,19 @@ class OrderServiceTest {
         AddressNotFoundForCustomerException addressNotFoundForCustomerException = assertThrows(AddressNotFoundForCustomerException.class,
                 () -> orderService.create(orderToCreate));
         assertEquals("Address does not exist in the system.", addressNotFoundForCustomerException.getMessage());
+    }
+
+    @Test
+    void shouldThrowErrorWhenPaymentModeIsInvalid() {
+        String INVALID_PAYMENT_MODE = "ZETA_CARD";
+        Order orderToCreate = Order.builder()
+                .id(111L)
+                .quantity(2)
+                .paymentMode(INVALID_PAYMENT_MODE)
+                .build();
+
+        InvalidPaymentModeException invalidPaymentModeException = assertThrows(InvalidPaymentModeException.class,
+                () -> orderService.create(orderToCreate));
+        assertEquals("Payment mode is invalid.", invalidPaymentModeException.getMessage());
     }
 }

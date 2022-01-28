@@ -9,6 +9,7 @@ import com.tw.bootcamp.bookshop.user.UserService;
 import com.tw.bootcamp.bookshop.user.address.Address;
 import com.tw.bootcamp.bookshop.user.address.AddressService;
 import com.tw.bootcamp.bookshop.user.order.error.AddressNotFoundForCustomerException;
+import com.tw.bootcamp.bookshop.user.order.error.InvalidPaymentModeException;
 import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeLessThanOneException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -46,7 +47,7 @@ public class OrderController {
             description = "Order created", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = OrderResponse.class))})}
     )
-    public ResponseEntity<OrderResponse> create(@RequestBody CreateOrderRequest createRequest, Principal principal) throws BookNotFoundException, RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException {
+    public ResponseEntity<OrderResponse> create(@RequestBody CreateOrderRequest createRequest, Principal principal) throws BookNotFoundException, RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException, InvalidPaymentModeException {
         User user = userService.findByEmail(principal.getName()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         Address address = addressService.loadAddressById(createRequest.getAddressId()).orElseThrow(() -> new RuntimeException("Address not found"));
         Book book = bookService.fetchByBookId(createRequest.getBookId());

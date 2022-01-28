@@ -4,7 +4,9 @@ import com.tw.bootcamp.bookshop.book.error.RequiredBookQuantityNotAvailableExcep
 import com.tw.bootcamp.bookshop.user.address.Address;
 import com.tw.bootcamp.bookshop.user.address.AddressRepository;
 import com.tw.bootcamp.bookshop.user.order.error.AddressNotFoundForCustomerException;
+import com.tw.bootcamp.bookshop.user.order.error.InvalidPaymentModeException;
 import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeLessThanOneException;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +21,22 @@ public class OrderService {
     private AddressRepository addressRepository;
 
     @Transactional
-    public Order create(Order order) throws RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException {
-        validateOrderQuantity(order);
-        validateAddress(order);
+    public Order create(Order order) throws RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException, InvalidPaymentModeException {
+        validateOrder(order);
         order.getBookToPurchase().decreaseBookCountByQuantity(order.getQuantity());
         return orderRepository.save(order);
+    }
+
+    private void validateOrder(Order order) throws InvalidPaymentModeException, OrderQuantityCannotBeLessThanOneException, RequiredBookQuantityNotAvailableException, AddressNotFoundForCustomerException {
+        validatePaymentMode(order);
+        validateOrderQuantity(order);
+        validateAddress(order);
+    }
+
+    private void validatePaymentMode(Order order) throws InvalidPaymentModeException {
+        if(!EnumUtils.isValidEnumIgnoreCase(PaymentMode.class, order.getPaymentMode())){
+            throw new InvalidPaymentModeException();
+        }
     }
 
     private void validateOrderQuantity(Order order) throws OrderQuantityCannotBeLessThanOneException, RequiredBookQuantityNotAvailableException {
