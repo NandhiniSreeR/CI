@@ -73,16 +73,16 @@ public class OrderController {
             @RequestParam(required = false, name = "startDate") Optional<String> maybeStartDateStr,
             @RequestParam(required = false, name = "endDate") Optional<String> maybeEndDateStr) {
 
-        List<Order> orders =
-                orderService.findAllOrdersForAdmin(getDateFromString(maybeStartDateStr), getDateFromString(maybeEndDateStr));
+        List<Order> orders = orderService.findAllOrdersForAdmin(parse(maybeStartDateStr), parse(maybeEndDateStr));
 
-        List<AdminOrderResponse> adminOrderResponses = orders.stream()
+        List<AdminOrderResponse> adminOrderResponses = orders
+                .stream()
                 .map(Order::toAdminOrderResponse)
                 .collect(Collectors.toList());
         return new ResponseEntity<>(adminOrderResponses, HttpStatus.OK);
     }
 
-    private Optional<Date> getDateFromString(Optional<String> maybeDate) {
+    private Optional<Date> parse(Optional<String> maybeDate) {
         try {
             return maybeDate.isPresent() ? Optional.of(dateFormat.parse(maybeDate.get())) : Optional.empty();
         } catch (ParseException e) {
