@@ -68,7 +68,7 @@ public class BookController {
                 .collect(Collectors.toList());
     }
 
-    @PostMapping(value = "/admin/load-books", consumes = "multipart/form-data")
+    @PostMapping(value = "/admin/books/load", consumes = "multipart/form-data")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Load books from CSV file", description = "Loads all valid books from the uploaded CSV. Invalid books are returned as a response. " +
             "Invalid book refers to empty values for title, author_name, price, book_count. " +
