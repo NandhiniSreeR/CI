@@ -69,19 +69,16 @@ public class OrderController {
             description = "Orders returned", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = AdminOrderResponse.class))})}
     )
-    public ResponseEntity<List<AdminOrderResponse>> findAllOrders(@RequestParam(required = false, name = "startDate") Optional<String> maybeStartDate,
-                                                                  @RequestParam(required = false, name = "endDate") Optional<String> maybeEndDate) {
+    public ResponseEntity<List<AdminOrderResponse>> findAllOrders(
+            @RequestParam(required = false, name = "startDate") Optional<String> maybeStartDateStr,
+            @RequestParam(required = false, name = "endDate") Optional<String> maybeEndDateStr) {
+
         List<Order> orders;
+        Optional<Date> maybeStartDate = getDateFromString(maybeStartDateStr);
+        Optional<Date> maybeEndDate = getDateFromString(maybeEndDateStr);
+
         if (maybeStartDate.isPresent() || maybeEndDate.isPresent()) {
-            Optional<Date> startDate;
-            Optional<Date> endDate;
-            try {
-                startDate = maybeStartDate.isPresent() ? Optional.of(dateFormat.parse(maybeStartDate.get())) : Optional.empty();
-                endDate = maybeEndDate.isPresent() ? Optional.of(dateFormat.parse(maybeEndDate.get())) : Optional.empty();
-            } catch (ParseException e) {
-                throw new InvalidDateFormatException("Please enter date in format 'yyyy-MM-dd' e.g. '2020-08-10' ");
-            }
-            orders = orderService.findAllOrdersForAdmin(startDate, endDate);
+            orders = orderService.findAllOrdersForAdmin(maybeStartDate, maybeEndDate);
         } else {
             orders = orderService.findAllOrdersForAdmin();
         }
@@ -90,6 +87,14 @@ public class OrderController {
                 .map(Order::toAdminOrderResponse)
                 .collect(Collectors.toList());
         return new ResponseEntity<>(adminOrderResponses, HttpStatus.OK);
+    }
+
+    private Optional<Date> getDateFromString(Optional<String> maybeDate) {
+        try {
+            return maybeDate.isPresent() ? Optional.of(dateFormat.parse(maybeDate.get())) : Optional.empty();
+        } catch (ParseException e) {
+            throw new InvalidDateFormatException("Please enter date in format 'yyyy-MM-dd' e.g. '2020-08-10' ");
+        }
     }
 
 }

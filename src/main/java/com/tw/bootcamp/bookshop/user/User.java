@@ -40,6 +40,7 @@ public class User {
     private Role role;
 
     // NOTE: 25/01/22 : Nandhini + Devesh - Do not uncomment this unless you have better solution, it creates infinite chain of nested objects
+    // TODO: 28/01/22 : Fix this using @JsonIgnore
     /*@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private List<Address> addresses;*/
 
