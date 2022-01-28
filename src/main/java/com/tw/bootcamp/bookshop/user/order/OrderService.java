@@ -63,7 +63,8 @@ public class OrderService {
     public List<Order> findAllOrdersForAdmin(Optional<Date> maybeStartDate, Optional<Date> maybeEndDate) {
         Date now = DateUtils.truncate(Calendar.getInstance().getTime(), Calendar.SECOND);
         Date endDate = maybeEndDate.orElse(now);
-        return maybeStartDate.map(startDate ->
+        return maybeStartDate
+                .map(startDate ->
                         orderRepository.findAllByOrderDateBetween(startDate, endDate)
                 )
                 .orElseGet(() -> orderRepository.findAllByOrderDateBefore(endDate));
