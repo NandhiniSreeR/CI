@@ -33,6 +33,10 @@ public class AddressService {
         if (validationResponse.hasAnyErrors()) {
             throw new AddressNotValidException(validationResponse);
         }
+        List<Address> addresses = addressRepository.findAddressesByUserId(user.getId());
+        if(addresses.isEmpty()){
+            createRequest.setDefault(true);
+        }
         Address address = Address.create(createRequest, user);
         return addressRepository.save(address);
     }

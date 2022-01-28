@@ -184,6 +184,38 @@ class AddressServiceTest {
         assertEquals(user.getId(), address.getUser().getId());
     }
 
+    @Test
+    void shouldMakeAddressAsDefaultWhenCreatingFirstTime() {
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = createAddressWithNameAndMobileNo();
+
+        Address address = addressService.create(createRequest, user);
+
+        assertNotNull(address);
+        assertTrue(address.isDefault());
+        assertEquals("4 Privet Drive", address.getLineNoOne());
+        assertEquals(user.getId(), address.getUser().getId());
+    }
+
+    @Test
+    void shouldNotMakeAddressAsDefaultWhenCreatingTime() {
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = createAddressWithNameAndMobileNo();
+
+        Address address = addressService.create(createRequest, user);
+
+        assertNotNull(address);
+        assertTrue(address.isDefault());
+
+        CreateAddressRequest secondCreateRequest = createAddressWithNameAndMobileNo();
+
+        Address secondAddress = addressService.create(secondCreateRequest, user);
+
+        assertNotNull(secondAddress);
+        assertFalse(secondAddress.isDefault());
+
+    }
+
 
 
     private CreateAddressRequest addressWithInvalidMobileNumber() {

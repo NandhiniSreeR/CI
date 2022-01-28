@@ -55,7 +55,7 @@ public class Address {
         this.isDefault = false;
     }
 
-    public Address(String lineNoOne, String lineNoTwo, String city, String state, String pinCode, String country, User user,String fullname,Long mobileNumber) {
+    public Address(String lineNoOne, String lineNoTwo, String city, String state, String pinCode, String country, User user,String fullname,Long mobileNumber,boolean isDefault) {
         this.lineNoOne = lineNoOne;
         this.lineNoTwo = lineNoTwo;
         this.city = city;
@@ -65,6 +65,7 @@ public class Address {
         this.user = user;
         this.fullName = fullname;
         this.mobileNumber = mobileNumber;
+        this.isDefault = isDefault;
     }
 
     public static Address create(CreateAddressRequest createRequest, User user) {
@@ -76,7 +77,8 @@ public class Address {
                 createRequest.getCountry(),
                 user,
                 createRequest.getFullName(),
-                createRequest.getMobileNumber()
+                createRequest.getMobileNumber(),
+                createRequest.isDefault()
         );
     }
 
@@ -91,6 +93,7 @@ public class Address {
                 .pinCode(pinCode)
                 .fullName(fullName)
                 .mobileNumber(mobileNumber)
+                .defaultShippingAddress(isDefault)
                 .build();
     }
 

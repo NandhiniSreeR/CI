@@ -31,4 +31,10 @@ public class CreateAddressRequest {
     @NotBlank
     @Schema(example = "India", description = "Country Name")
     private String country;
+    @Schema(example = "true", description = "User's default shipping address")
+    private boolean isDefault;
+
+    public void setDefault(boolean aDefault) {
+        isDefault = aDefault;
+    }
 }

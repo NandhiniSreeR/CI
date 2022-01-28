@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.user.address;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,4 +36,6 @@ public class AddressResponse {
     private String fullName;
     @Schema(example = "9876543210", description = "Mobile number of the customer")
     private Long mobileNumber;
+    @Schema(example = "true", description = "User's default shipping address")
+    private boolean defaultShippingAddress;
 }
