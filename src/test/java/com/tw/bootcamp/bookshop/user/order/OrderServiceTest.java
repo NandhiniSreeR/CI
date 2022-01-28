@@ -5,7 +5,6 @@ import com.tw.bootcamp.bookshop.book.error.RequiredBookQuantityNotAvailableExcep
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.address.Address;
 import com.tw.bootcamp.bookshop.user.address.AddressRepository;
-import com.tw.bootcamp.bookshop.user.address.AddressTestBuilder;
 import com.tw.bootcamp.bookshop.user.order.error.AddressNotFoundForCustomerException;
 import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeLessThanOneException;
 import org.junit.jupiter.api.Test;
@@ -14,13 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
