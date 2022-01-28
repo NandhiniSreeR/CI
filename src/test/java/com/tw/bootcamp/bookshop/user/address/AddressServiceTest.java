@@ -57,87 +57,59 @@ class AddressServiceTest {
 
     @Test
     void shouldDisplayUserAddressesWhenGivenUserEmail() {
-        // ARRANGE
         User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = createAddress();
         Address address = addressService.create(createRequest, user);
-        // ACT
+
         List<Address> userAddresses =  addressService.loadAddressForUser(user);
-        // ASSERT
+
         assertEquals(1, userAddresses.size());
         assertEquals(address.getId(), userAddresses.get(0).getId());
     }
 
     @Test
     void shouldReturnErrorResponseWhenInvalidCityInInput() {
-        // ARRANGE
         User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = addressWithInvalidCity();
 
         AddressErrorResponse errorResponses =  addressService.validate(createRequest);
 
-       // Address address = addressService.create(createRequest, user);
-        // ACT
-        // ASSERT
         assertTrue(errorResponses.hasAnyErrors());
     }
 
-
     @Test
     void shouldReturnTrueWhenAddressIsValid() {
-        // ARRANGE
-        User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = createAddress();
 
         AddressErrorResponse errorResponses =  addressService.validate(createRequest);
 
-        // Address address = addressService.create(createRequest, user);
-        // ACT
-        // ASSERT
         assertFalse(errorResponses.hasAnyErrors());
     }
 
     @Test
     void shouldReturnErrorResponseWhenInvalidCountryInInput() {
-        // ARRANGE
-        User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = addressWithInvalidCountry();
 
         AddressErrorResponse errorResponses =  addressService.validate(createRequest);
 
-        // Address address = addressService.create(createRequest, user);
-        // ACT
-        // ASSERT
         assertTrue(errorResponses.hasAnyErrors());
     }
 
     @Test
     void shouldReturnErrorResponseWhenCountryContainsAlphanumericInInput() {
-        // ARRANGE
-        User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = addressWithInvalidAlphanumericCountry();
 
         AddressErrorResponse errorResponses =  addressService.validate(createRequest);
 
-        // Address address = addressService.create(createRequest, user);
-        // ACT
-        // ASSERT
         assertTrue(errorResponses.hasAnyErrors());
     }
 
-
-
     @Test
     void shouldReturnErrorResponseWhenInvalidCountryAndInvalidCityAndInvalidStateInInput() {
-        // ARRANGE
-        User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = addressWithInvalidCountryAndInvalidCityAndInvalidState();
 
         AddressErrorResponse errorResponses =  addressService.validate(createRequest);
 
-        // Address address = addressService.create(createRequest, user);
-        // ACT
-        // ASSERT
         assertTrue(errorResponses.hasAnyErrors());
         assertEquals(3,errorResponses.countOfErrors());
 
@@ -145,29 +117,19 @@ class AddressServiceTest {
 
     @Test
     void shouldReturnErrorResponseWhenInvalidPincodeInInput() {
-        // ARRANGE
-        User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = addressWithInvalidPincode();
 
         AddressErrorResponse errorResponses =  addressService.validate(createRequest);
 
-        // Address address = addressService.create(createRequest, user);
-        // ACT
-        // ASSERT
         assertTrue(errorResponses.hasAnyErrors());
     }
 
     @Test
     void shouldReturnErrorResponseWhenInvalidMobileNumberInInput() {
-        // ARRANGE
-        User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = addressWithInvalidMobileNumber();
 
         AddressErrorResponse errorResponses =  addressService.validate(createRequest);
 
-        // Address address = addressService.create(createRequest, user);
-        // ACT
-        // ASSERT
         assertTrue(errorResponses.hasAnyErrors());
     }
 
@@ -216,8 +178,6 @@ class AddressServiceTest {
 
     }
 
-
-
     private CreateAddressRequest addressWithInvalidMobileNumber() {
         return CreateAddressRequest.builder()
                 .fullName("Mr. X")
@@ -229,7 +189,6 @@ class AddressServiceTest {
                 .country("Surrey")
                 .build();
     }
-
 
     private CreateAddressRequest createAddressWithNameAndMobileNo() {
         return CreateAddressRequest.builder()
@@ -265,7 +224,6 @@ class AddressServiceTest {
                 .build();
     }
 
-
     private CreateAddressRequest addressWithInvalidCountry() {
         return CreateAddressRequest.builder()
                 .lineNoOne("4 Privet Drive")
@@ -285,8 +243,6 @@ class AddressServiceTest {
                 .country("Bangalore1")
                 .build();
     }
-
-
 
     private CreateAddressRequest invalidAddress() {
         return CreateAddressRequest.builder()
