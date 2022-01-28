@@ -21,10 +21,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Entity
 @Table(name = "orders")
-/*@TypeDef(
-        name = "pgsql_enum",
-        typeClass = PostgreSQLType.class
-)*/
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,17 +33,17 @@ public class Order {
     @Column(columnDefinition = "timestamp")
     private Date orderDate;
 
-    //@Enumerated(EnumType.STRING)
-    //@Type(type = "pgsql_enum")
     @NotBlank
     private String paymentMode;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
     private Address shippingAddress;
+
     @ManyToOne
     @JoinColumn(name = "book_id", nullable = false)
     private Book bookToPurchase;

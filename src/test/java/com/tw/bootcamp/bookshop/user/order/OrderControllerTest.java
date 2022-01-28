@@ -64,8 +64,6 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.id").value(111L));
     }
 
-    //TODO : Invalid payment mode
-
     private CreateOrderRequest createOrder() {
         return CreateOrderRequest.builder()
                 .quantity(1)
