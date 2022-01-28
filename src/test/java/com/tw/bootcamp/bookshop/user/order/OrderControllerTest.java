@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tw.bootcamp.bookshop.book.Book;
 import com.tw.bootcamp.bookshop.book.BookService;
 import com.tw.bootcamp.bookshop.book.BookTestBuilder;
+import com.tw.bootcamp.bookshop.book.error.RequiredBookQuantityNotAvailableException;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserService;
 import com.tw.bootcamp.bookshop.user.UserTestBuilder;
@@ -23,7 +24,7 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -70,7 +71,24 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.id").value(111L));
     }
 
-    //TODO : Invalid payment mode
+    @Test
+    void shouldThrowExceptionWhenRequiredBookQuantityNotAvailableInInventory() throws Exception {
+        CreateOrderRequest createRequest = createOrderRequest();
+        when(userService.findByEmail(anyString())).thenReturn(Optional.of(new UserTestBuilder().build()));
+        when(addressService.loadAddressById(anyLong())).thenReturn(Optional.of(new AddressTestBuilder().build()));
+        when(orderService.create(any(Order.class))).thenThrow(new RequiredBookQuantityNotAvailableException());
+
+        mockMvc.perform(post("/orders")
+                        .content(objectMapper.writeValueAsString(createRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isExpectationFailed())
+                .andExpect(jsonPath("$.message").
+                        value("Required book quantity is not available in the system"));
+
+        verify(orderService, times(1)).create(any(Order.class));
+    }
+
+    //TODO : OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException
 
     private CreateOrderRequest createOrderRequest() {
         return CreateOrderRequest.builder()
