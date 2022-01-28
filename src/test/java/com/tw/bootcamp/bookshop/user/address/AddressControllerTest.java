@@ -1,9 +1,12 @@
 package com.tw.bootcamp.bookshop.user.address;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tw.bootcamp.bookshop.error.AddressErrorResponse;
+import com.tw.bootcamp.bookshop.error.AddressNotValidException;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserService;
 import com.tw.bootcamp.bookshop.user.UserTestBuilder;
+import com.tw.bootcamp.bookshop.user.order.error.AddressNotFoundForCustomerException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -116,6 +119,51 @@ class AddressControllerTest {
                 .andExpect(jsonPath("$.message").value("User email does not exist"));
     }
 
+    @Test
+    void shouldNotSaveAddressWhenFieldsAreNotPassingValidation() throws Exception{
+        CreateAddressRequest createRequest = createInvalidAddress();
+        AddressErrorResponse addressErrorResponse =
+                new AddressErrorResponse("Failed to save address as some of the fields are invalid");
+        addressErrorResponse.addError("mobileNumber","Invalid Mobile Number.Accepts only 10 digit Numbers");
+        Address address = new AddressTestBuilder().build();
+        when(addressService.create(eq(createRequest), any(User.class))).thenThrow(new AddressNotValidException(addressErrorResponse));
+        when(userService.findByEmail(anyString())).thenReturn(Optional.of(new UserTestBuilder().build()));
+
+        mockMvc.perform(post("/addresses")
+                        .content(objectMapper.writeValueAsString(createRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorMessage").value("Failed to save address as some of the fields are invalid"));
+    }
+
+    @Test
+    void shouldSaveAddressWhenValidNameAndMobileNumberArePassed() throws Exception{
+        CreateAddressRequest createRequest = createAddressWithNameAndMobileNo();
+        Address address = new AddressTestBuilder().build();
+        when(addressService.create(eq(createRequest), any(User.class))).thenReturn(address);
+        when(userService.findByEmail(anyString())).thenReturn(Optional.of(new UserTestBuilder().build()));
+
+        mockMvc.perform(post("/addresses")
+                        .content(objectMapper.writeValueAsString(createRequest))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.mobileNumber").value(9876143210L))
+                .andExpect(jsonPath("$.fullName").value("Jane Doe"));
+    }
+
+    private CreateAddressRequest createAddressWithNameAndMobileNo() {
+        return CreateAddressRequest.builder()
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("Bangalore")
+                .pinCode("A22001")
+                .country("India")
+                .state("Karnataka")
+                .mobileNumber(9876143210L)
+                .fullName("Jane Doe")
+                .build();
+    }
+
     private CreateAddressRequest createAddress() {
         return CreateAddressRequest.builder()
                 .lineNoOne("4 Privet Drive")
@@ -123,6 +171,18 @@ class AddressControllerTest {
                 .city("Godstone")
                 .pinCode("A22 001")
                 .country("Surrey")
+                .build();
+    }
+
+    private CreateAddressRequest createInvalidAddress() {
+        return CreateAddressRequest.builder()
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("Bangalore1")
+                .pinCode("A22+001")
+                .country("India1")
+                .state("Karnataka1")
+                .mobileNumber(98761L)
                 .build();
     }
 }

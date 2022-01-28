@@ -23,6 +23,7 @@ import java.util.Objects;
 public class User {
     public static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(example = "1", description = "Unique identifier of the user")
@@ -77,4 +78,5 @@ public class User {
     public int hashCode() {
         return getClass().hashCode();
     }
+
 }

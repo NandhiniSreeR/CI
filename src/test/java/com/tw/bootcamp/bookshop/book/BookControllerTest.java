@@ -100,7 +100,7 @@ class BookControllerTest {
         InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
         MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
 
-        this.mockMvc.perform(multipart("/admin/load-books")
+        this.mockMvc.perform(multipart("/admin/books/load")
                         .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isOk());
         if (uploadStream != null) {
@@ -113,7 +113,7 @@ class BookControllerTest {
         InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.txt");
         MockMultipartFile file = new MockMultipartFile("file", "Book List.txt", "text/plain", uploadStream);
 
-        this.mockMvc.perform(multipart("/admin/load-books")
+        this.mockMvc.perform(multipart("/admin/books/load")
                         .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isBadRequest());
         if (uploadStream != null) {
@@ -126,7 +126,7 @@ class BookControllerTest {
         InputStream uploadStream = BookControllerTest.class.getClassLoader().getResourceAsStream("Book List.csv");
         MockMultipartFile file = new MockMultipartFile("file", "Book List.csv", "text/csv", uploadStream);
 
-        this.mockMvc.perform(multipart("/admin/load-books")
+        this.mockMvc.perform(multipart("/admin/books/load")
                         .file(file).with(user("user@bookshopify.com").password("user").roles(Role.USER.name())))
                 .andExpect(status().isForbidden());
         if (uploadStream != null) {
@@ -136,7 +136,7 @@ class BookControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenFileIsMissing() throws Exception {
-        this.mockMvc.perform(multipart("/admin/load-books").with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
+        this.mockMvc.perform(multipart("/admin/books/load").with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isBadRequest());
     }
 
@@ -161,7 +161,7 @@ class BookControllerTest {
                 .languageCode("eng")
                 .build();
 
-        this.mockMvc.perform(multipart("/admin/load-books")
+        this.mockMvc.perform(multipart("/admin/books/load")
                         .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isOk());
 
@@ -241,7 +241,7 @@ class BookControllerTest {
         failedBooks.add(book);
         when(bookService.loadBooks(any())).thenReturn(failedBooks);
 
-        MvcResult result = this.mockMvc.perform(multipart("/admin/load-books")
+        MvcResult result = this.mockMvc.perform(multipart("/admin/books/load")
                         .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -264,7 +264,7 @@ class BookControllerTest {
 
         when(bookService.loadBooks(any())).thenReturn(Collections.emptyList());
 
-        MvcResult result = this.mockMvc.perform(multipart("/admin/load-books")
+        MvcResult result = this.mockMvc.perform(multipart("/admin/books/load")
                         .file(file).with(user("admin@bookshopify.com").password("admin").roles(Role.ADMIN.name())))
                 .andExpect(status().isOk())
                 .andReturn();
