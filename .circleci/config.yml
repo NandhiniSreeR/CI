@@ -22,7 +22,7 @@ jobs:
       - image: openjdk:8-jdk-alpine
     steps:
       - checkout
-      - run: ./gradlew bootJar
+      - run: ./gradlew build
       - persist_to_workspace:
           root: ./
           paths:
