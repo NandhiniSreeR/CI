@@ -11,7 +11,9 @@ public class AddressTestBuilder {
                 .lineNoTwo("Little Whinging")
                 .city("Godstone")
                 .pinCode("A22 001")
-                .country("Surrey");
+                .country("Surrey")
+                .mobileNumber(9876143210L)
+                .fullName("Jane Doe");
     }
 
     public AddressTestBuilder withUser(User user) {
