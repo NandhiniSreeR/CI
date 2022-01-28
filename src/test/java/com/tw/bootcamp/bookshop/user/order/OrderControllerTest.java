@@ -108,7 +108,7 @@ class OrderControllerTest {
         Order firstOrder = createOrder(111L);
         Order secondOrder = createOrder(222L);
 
-        when(orderService.findAllOrdersForAdmin()).thenReturn(asList(firstOrder, secondOrder));
+        when(orderService.findAllOrdersForAdmin(Optional.empty(), Optional.empty())).thenReturn(asList(firstOrder, secondOrder));
 
         mockMvc.perform(get("/admin/orders"))
                 .andExpect(status().isOk())

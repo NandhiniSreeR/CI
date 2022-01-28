@@ -73,15 +73,8 @@ public class OrderController {
             @RequestParam(required = false, name = "startDate") Optional<String> maybeStartDateStr,
             @RequestParam(required = false, name = "endDate") Optional<String> maybeEndDateStr) {
 
-        List<Order> orders;
-        Optional<Date> maybeStartDate = getDateFromString(maybeStartDateStr);
-        Optional<Date> maybeEndDate = getDateFromString(maybeEndDateStr);
-
-        if (maybeStartDate.isPresent() || maybeEndDate.isPresent()) {
-            orders = orderService.findAllOrdersForAdmin(maybeStartDate, maybeEndDate);
-        } else {
-            orders = orderService.findAllOrdersForAdmin();
-        }
+        List<Order> orders =
+                orderService.findAllOrdersForAdmin(getDateFromString(maybeStartDateStr), getDateFromString(maybeEndDateStr));
 
         List<AdminOrderResponse> adminOrderResponses = orders.stream()
                 .map(Order::toAdminOrderResponse)

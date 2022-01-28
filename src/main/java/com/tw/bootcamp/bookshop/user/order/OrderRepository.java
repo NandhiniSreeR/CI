@@ -8,9 +8,11 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findAllByOrderDateAfter(Date startDate);
+
+//    List<Order> findAllByOrderDateAfter(Date startDate);
 
     List<Order> findAllByOrderDateBefore(Date endDate);
 
     List<Order> findAllByOrderDateBetween(Date startDate, Date endDate);
+
 }
