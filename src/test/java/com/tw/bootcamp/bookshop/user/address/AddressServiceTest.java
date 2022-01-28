@@ -113,6 +113,22 @@ class AddressServiceTest {
     }
 
     @Test
+    void shouldReturnErrorResponseWhenCountryContainsAlphanumericInInput() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = addressWithInvalidAlphanumericCountry();
+
+        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+
+        // Address address = addressService.create(createRequest, user);
+        // ACT
+        // ASSERT
+        assertTrue(errorResponses.hasAnyErrors());
+    }
+
+
+
+    @Test
     void shouldReturnErrorResponseWhenInvalidCountryAndInvalidCityAndInvalidStateInInput() {
         // ARRANGE
         User user = userRepository.save(new UserTestBuilder().build());
@@ -226,6 +242,16 @@ class AddressServiceTest {
                 .city("Pune")
                 .pinCode("A22001")
                 .country("123456")
+                .build();
+    }
+
+    private CreateAddressRequest addressWithInvalidAlphanumericCountry() {
+        return CreateAddressRequest.builder()
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("Pune")
+                .pinCode("A22001")
+                .country("Bangalore1")
                 .build();
     }
 

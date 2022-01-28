@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
@@ -22,7 +23,7 @@ public class AddressService {
     private AddressRepository addressRepository;
 
 
-    public static final String ADDRESS_CITY_COUNTRY_STATE_REGEX = "[0-9]+";
+    public static final String ADDRESS_CITY_COUNTRY_STATE_REGEX = "[A-Za-z]+";
     public static final String ADDRESS_PINCODE_REGEX = "^[A-Za-z0-9]*";
     public static final String ADDRESS_MOBILE_NUMBER_REGEX = "[\\d]{10}";
 
@@ -46,13 +47,13 @@ public class AddressService {
 
     public AddressErrorResponse validate(CreateAddressRequest createAddressRequest) {
         AddressErrorResponse addressErrorResponse = new AddressErrorResponse("Failed to save address as some of the fields are invalid");
-        if (createAddressRequest.getCity() != null && Pattern.matches(ADDRESS_CITY_COUNTRY_STATE_REGEX, createAddressRequest.getCity())) {
+        if (createAddressRequest.getCity() != null && !Pattern.matches(ADDRESS_CITY_COUNTRY_STATE_REGEX, createAddressRequest.getCity())) {
             addressErrorResponse.addError("city", INVALID_CHARACTERS_IN_THIS_FIELD_ACCEPTS_ONLY_ALPHABETS);
         }
-        if (createAddressRequest.getCountry() != null && Pattern.matches(ADDRESS_CITY_COUNTRY_STATE_REGEX, createAddressRequest.getCountry())) {
+        if (createAddressRequest.getCountry() != null && !Pattern.matches(ADDRESS_CITY_COUNTRY_STATE_REGEX, createAddressRequest.getCountry())) {
             addressErrorResponse.addError("country", INVALID_CHARACTERS_IN_THIS_FIELD_ACCEPTS_ONLY_ALPHABETS);
         }
-        if (createAddressRequest.getState() != null && Pattern.matches(ADDRESS_CITY_COUNTRY_STATE_REGEX, createAddressRequest.getState())) {
+        if (createAddressRequest.getState() != null && !Pattern.matches(ADDRESS_CITY_COUNTRY_STATE_REGEX, createAddressRequest.getState())) {
             addressErrorResponse.addError("state", INVALID_CHARACTERS_IN_THIS_FIELD_ACCEPTS_ONLY_ALPHABETS);
         }
         if (createAddressRequest.getPinCode() != null && !Pattern.matches(ADDRESS_PINCODE_REGEX, createAddressRequest.getPinCode())) {
