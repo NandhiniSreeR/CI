@@ -24,7 +24,7 @@ public class PaymentController {
             schema = @Schema(implementation = PaymentResponse.class))})}
     )
     public ResponseEntity<PaymentResponse> makeCreditCardPayment(@RequestBody CreditCardDetailsRequest ccRequest) throws ParseException {
-        CreditCardDetailsRequest.validate(ccRequest);
+        ccRequest.validate();
         PaymentResponse response = PaymentResponse.builder().status(true).build();
         return ResponseEntity.ok(response);
     }

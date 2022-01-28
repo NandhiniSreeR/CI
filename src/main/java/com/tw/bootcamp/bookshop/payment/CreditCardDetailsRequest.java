@@ -8,7 +8,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.text.ParseException;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
@@ -43,17 +42,12 @@ public class CreditCardDetailsRequest {
 
     private String cardHolderName;
 
-    public static void validate(CreditCardDetailsRequest request) throws ParseException {
-        create(request.getCardNumber(), request.getCvv(), request.getExpiresOn(), request.getCardHolderName());
-    }
+    public void validate() {
+        YearMonth expiryYearMonth = formatAsYearMonth(this.expiresOn);
 
-    public static CreditCardDetailsRequest create(Long cardNumber, String cvv, String expiresOn, String cardHolderName) throws ParseException {
-        YearMonth expiryYearMonth = formatAsYearMonth(expiresOn);
         if (cardNumber < 1000_0000_0000_0000L || cardNumber > 9999_9999_9999_9999L) throw new InvalidCreditCardDetailsException("Invalid Credit Card Number");
-        if (!isValidCVVNumber(cvv)) throw new InvalidCreditCardDetailsException("Invalid CVV");
+        if (!isValidCVVNumber(this.cvv)) throw new InvalidCreditCardDetailsException("Invalid CVV");
         if (expiryYearMonth.isBefore(YearMonth.now())) throw new InvalidCreditCardDetailsException("Invalid Expiry Date");
-
-        return new CreditCardDetailsRequest(cardNumber, cvv, expiresOn, cardHolderName);
     }
 
     private static YearMonth formatAsYearMonth(String expiresOn) {
