@@ -7,11 +7,12 @@ import com.tw.bootcamp.bookshop.user.order.error.AddressNotFoundForCustomerExcep
 import com.tw.bootcamp.bookshop.user.order.error.InvalidPaymentModeException;
 import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeLessThanOneException;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -37,16 +38,16 @@ public class OrderService {
     }
 
     private void validatePaymentMode(Order order) throws InvalidPaymentModeException {
-        if(!EnumUtils.isValidEnumIgnoreCase(PaymentMode.class, order.getPaymentMode())){
+        if (!EnumUtils.isValidEnumIgnoreCase(PaymentMode.class, order.getPaymentMode())) {
             throw new InvalidPaymentModeException();
         }
     }
 
     private void validateOrderQuantity(Order order) throws OrderQuantityCannotBeLessThanOneException, RequiredBookQuantityNotAvailableException {
-        if(order.getQuantity() < 1){
+        if (order.getQuantity() < 1) {
             throw new OrderQuantityCannotBeLessThanOneException();
         }
-        if(order.getQuantity() > order.getBookToPurchase().getBooksCount()){
+        if (order.getQuantity() > order.getBookToPurchase().getBooksCount()) {
             throw new RequiredBookQuantityNotAvailableException();
         }
     }
@@ -59,11 +60,12 @@ public class OrderService {
                 .orElseThrow(AddressNotFoundForCustomerException::new);
     }
 
-    public List<Order> findAllOrdersForAdmin() {
-        return orderRepository.findAll();
-    }
-
-    public List<Order> findAllOrdersForAdmin(Optional<Date> startDate, Optional<Date> endDate) {
-        return Collections.emptyList();
+    public List<Order> findAllOrdersForAdmin(Optional<Date> maybeStartDate, Optional<Date> maybeEndDate) {
+        Date now = DateUtils.truncate(Calendar.getInstance().getTime(), Calendar.SECOND);
+        Date endDate = maybeEndDate.orElse(now);
+        return maybeStartDate.map(startDate ->
+                        orderRepository.findAllByOrderDateBetween(startDate, endDate)
+                )
+                .orElseGet(() -> orderRepository.findAllByOrderDateBefore(endDate));
     }
 }

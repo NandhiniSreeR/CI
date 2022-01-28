@@ -8,18 +8,20 @@ import com.tw.bootcamp.bookshop.user.address.AddressRepository;
 import com.tw.bootcamp.bookshop.user.order.error.AddressNotFoundForCustomerException;
 import com.tw.bootcamp.bookshop.user.order.error.InvalidPaymentModeException;
 import com.tw.bootcamp.bookshop.user.order.error.OrderQuantityCannotBeLessThanOneException;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -156,10 +158,24 @@ class OrderServiceTest {
     }
 
     @Test
-    void findAllOrderForAdmin() {
-        List<Order> orders = new ArrayList<>();
-        when(orderRepository.findAll()).thenReturn(orders);
-        List<Order> actual = orderService.findAllOrdersForAdmin();
-        assertEquals(orders, actual);
+    void shouldReturnAllOrdersWhenNoFilterIsApplied() {
+        orderService.findAllOrdersForAdmin(Optional.empty(), Optional.empty());
+        Date endDate = DateUtils.truncate(Calendar.getInstance().getTime(), Calendar.SECOND);
+        verify(orderRepository).findAllByOrderDateBefore(endDate);
+    }
+
+    @Test
+    void shouldReturnOrdersBeforeEndDate() {
+        Date endDate = Date.from(Instant.now().minus(100, ChronoUnit.DAYS));
+        orderService.findAllOrdersForAdmin(Optional.empty(), Optional.of(endDate));
+        verify(orderRepository).findAllByOrderDateBefore(endDate);
+    }
+
+    @Test
+    void shouldReturnOrdersFromStartDate() {
+        Date startDate = Date.from(Instant.now().minus(100, ChronoUnit.DAYS));
+        Date endDate = DateUtils.truncate(Calendar.getInstance().getTime(), Calendar.SECOND);
+        orderService.findAllOrdersForAdmin(Optional.of(startDate), Optional.empty());
+        verify(orderRepository).findAllByOrderDateBetween(startDate, endDate);
     }
 }

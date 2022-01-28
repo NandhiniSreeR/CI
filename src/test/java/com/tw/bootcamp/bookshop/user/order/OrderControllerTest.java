@@ -119,7 +119,7 @@ class OrderControllerTest {
     @Test
     @WithMockUser(username="admin",roles={"ADMIN"})
     void shouldReturnEmptyListWhenNoOrdersPlaced() throws Exception {
-        when(orderService.findAllOrdersForAdmin()).thenReturn(Collections.emptyList());
+        when(orderService.findAllOrdersForAdmin(Optional.empty(), Optional.empty())).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/admin/orders"))
                 .andExpect(status().isOk())
