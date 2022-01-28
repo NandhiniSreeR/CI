@@ -1,5 +1,6 @@
 package com.tw.bootcamp.bookshop.error;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +17,7 @@ public class ErrorResponse {
     @Schema(example = "Bad Request", description = "details of the request")
     private final String message;
     @Schema(description = "errors of the request")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private final Map<String, String > errors;
 
     public ErrorResponse(HttpStatus status, String message) {

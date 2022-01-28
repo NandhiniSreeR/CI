@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,7 +37,6 @@ public class UserController {
     }
 
     @PutMapping("/admin/role")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Update User Role", description = "Admin user can update the role for any user", tags = {"User Service"})
     @ApiResponses(
             value = {
