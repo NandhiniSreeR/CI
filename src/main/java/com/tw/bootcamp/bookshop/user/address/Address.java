@@ -39,6 +39,12 @@ public class Address {
     private String country;
     @Schema(example = "true", description = "User's default shipping address")
     private boolean isDefault;
+    @Schema(example = "Jane Doe", description = "Name of the customer")
+   // @Column(name = "full_name")
+    private String fullName;
+    @Schema(example = "9876543210", description = "Mobile number of the customer")
+   // @Column(name = "mobile_number")
+    private Long mobileNumber;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -47,7 +53,7 @@ public class Address {
         this.isDefault = false;
     }
 
-    public Address(String lineNoOne, String lineNoTwo, String city, String state, String pinCode, String country, User user) {
+    public Address(String lineNoOne, String lineNoTwo, String city, String state, String pinCode, String country, User user,String fullname,Long mobileNumber) {
         this.lineNoOne = lineNoOne;
         this.lineNoTwo = lineNoTwo;
         this.city = city;
@@ -55,6 +61,8 @@ public class Address {
         this.pinCode = pinCode;
         this.country = country;
         this.user = user;
+        this.fullName = fullname;
+        this.mobileNumber = mobileNumber;
     }
 
     public static Address create(CreateAddressRequest createRequest, User user) {
@@ -64,7 +72,10 @@ public class Address {
                 createRequest.getState(),
                 createRequest.getPinCode(),
                 createRequest.getCountry(),
-                user);
+                user,
+                createRequest.getFullName(),
+                createRequest.getMobileNumber()
+        );
     }
 
     public AddressResponse toResponse() {
@@ -76,6 +87,8 @@ public class Address {
                 .state(state)
                 .country(country)
                 .pinCode(pinCode)
+                .fullName(fullName)
+                .mobileNumber(mobileNumber)
                 .build();
     }
 

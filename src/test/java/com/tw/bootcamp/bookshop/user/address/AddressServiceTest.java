@@ -143,6 +143,21 @@ class AddressServiceTest {
     }
 
     @Test
+    void shouldReturnErrorResponseWhenInvalidMobileNumberInInput() {
+        // ARRANGE
+        User user = userRepository.save(new UserTestBuilder().build());
+        CreateAddressRequest createRequest = addressWithInvalidMobileNumber();
+
+        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+
+        // Address address = addressService.create(createRequest, user);
+        // ACT
+        // ASSERT
+        assertTrue(errorResponses.hasAnyErrors());
+    }
+
+
+    @Test
     void shouldCreateAddressWhenValidNameAndMobileNoAreInput() {
         User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = createAddressWithNameAndMobileNo();
@@ -153,6 +168,21 @@ class AddressServiceTest {
         assertEquals("4 Privet Drive", address.getLineNoOne());
         assertEquals(user.getId(), address.getUser().getId());
     }
+
+
+
+    private CreateAddressRequest addressWithInvalidMobileNumber() {
+        return CreateAddressRequest.builder()
+                .fullName("Mr. X")
+                .mobileNumber(98743210L)
+                .lineNoOne("4 Privet Drive")
+                .lineNoTwo("Little Whinging")
+                .city("Godstone")
+                .pinCode("A22001")
+                .country("Surrey")
+                .build();
+    }
+
 
     private CreateAddressRequest createAddressWithNameAndMobileNo() {
         return CreateAddressRequest.builder()

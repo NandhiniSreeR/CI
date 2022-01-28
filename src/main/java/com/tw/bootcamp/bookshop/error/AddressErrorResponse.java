@@ -9,11 +9,11 @@ import java.util.Map;
 @AllArgsConstructor
 @Getter
 public class AddressErrorResponse {
-    private final String message;
+    private final String errorMessage;
     private final Map<String, String > errors;
 
-    public AddressErrorResponse(String message) {
-        this.message = message;
+    public AddressErrorResponse(String errorMessage) {
+        this.errorMessage = errorMessage;
         this.errors = new HashMap<>();
     }
 
