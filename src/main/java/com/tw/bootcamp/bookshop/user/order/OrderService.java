@@ -38,7 +38,7 @@ public class OrderService {
     private void validateAddress(Order order) throws AddressNotFoundForCustomerException {
         List<Address> addresses = addressRepository.findAllByUser(order.getUser());
         addresses.stream()
-                .filter(p -> p.getId().equals(order.getShippingAddress().getId()))
+                .filter(p -> p.getId() == order.getShippingAddress().getId())
                 .findFirst()
                 .orElseThrow(AddressNotFoundForCustomerException::new);
     }
