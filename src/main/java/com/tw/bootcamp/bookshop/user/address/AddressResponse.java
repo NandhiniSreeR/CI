@@ -31,4 +31,8 @@ public class AddressResponse {
     @NotBlank
     @Schema(example = "India", description = "Country Name")
     private String country;
+    @Schema(example = "Jane Doe", description = "Name of the customer")
+    private String fullName;
+    @Schema(example = "9876543210", description = "Mobile number of the customer")
+    private Long mobileNumber;
 }

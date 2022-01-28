@@ -11,6 +11,10 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class CreateAddressRequest {
+    @Schema(example = "Jane Doe", description = "Name of the customer")
+    private String fullName;
+    @Schema(example = "9876543210", description = "Mobile number of the customer")
+    private Long mobileNumber;
     @Schema(example = "24/l XYZ society", description = "Address line 1")
     @NotBlank
     private String lineNoOne;
