@@ -1,12 +1,14 @@
 package com.tw.bootcamp.bookshop.user.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tw.bootcamp.bookshop.book.Book;
 import com.tw.bootcamp.bookshop.book.BookService;
 import com.tw.bootcamp.bookshop.book.BookTestBuilder;
 import com.tw.bootcamp.bookshop.user.Role;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserService;
 import com.tw.bootcamp.bookshop.user.UserTestBuilder;
+import com.tw.bootcamp.bookshop.user.address.Address;
 import com.tw.bootcamp.bookshop.user.address.AddressService;
 import com.tw.bootcamp.bookshop.user.address.AddressTestBuilder;
 import org.junit.jupiter.api.Test;
@@ -50,7 +52,7 @@ class OrderControllerTest {
 
     @Test
     void shouldCreateOrderForValidAddressAndBookId() throws Exception {
-        CreateOrderRequest createRequest = createOrder();
+        CreateOrderRequest createRequest = createOrderRequest();
 
         when(userService.findByEmail(anyString())).thenReturn(Optional.of(new UserTestBuilder().build()));
         when(addressService.loadAddressById(anyLong())).thenReturn(Optional.of(new AddressTestBuilder().build()));
@@ -68,7 +70,9 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.id").value(111L));
     }
 
-    private CreateOrderRequest createOrder() {
+    //TODO : Invalid payment mode
+
+    private CreateOrderRequest createOrderRequest() {
         return CreateOrderRequest.builder()
                 .quantity(1)
                 .paymentMode(PaymentMode.CASH_ON_DELIVERY)
@@ -80,26 +84,47 @@ class OrderControllerTest {
     @Test
     @WithMockUser(username="admin",roles={"ADMIN"})
     void shouldReturnListOfAllPlacedOrders() throws Exception {
-
-        User adminUser = new UserTestBuilder().build();
-        adminUser.setRole(Role.ADMIN);
-        userService.updateRole(adminUser);
-
-        AdminOrderResponse firstOrder = createAdminOrderResponse(111L);
-        AdminOrderResponse secondOrder = createAdminOrderResponse(222L);
+        Order firstOrder = createOrder(111L);
+        Order secondOrder = createOrder(222L);
 
         when(orderService.findAllOrdersForAdmin()).thenReturn(asList(firstOrder, secondOrder));
 
         mockMvc.perform(get("/admin/orders"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].orderNumber").value(firstOrder.getOrderNumber()))
-                .andExpect(jsonPath("$[1].orderNumber").value(secondOrder.getOrderNumber()));
+                .andExpect(jsonPath("$[0].orderNumber").value(firstOrder.getId()))
+                .andExpect(jsonPath("$[1].orderNumber").value(secondOrder.getId()));
     }
 
-    private AdminOrderResponse createAdminOrderResponse(Long orderNumber) {
-        return AdminOrderResponse
-                .builder()
-                .orderNumber(orderNumber)
+    private Order createOrder(Long id) {
+        User user = User.builder()
+                .id(1L)
+                .email("test@tw.com")
+                .build();
+        Address address = Address.builder()
+                .id(1L)
+                .mobileNumber(1234567890L)
+                .lineNoOne("Line1")
+                .lineNoTwo("Line2")
+                .city("city")
+                .state("state")
+                .pinCode("453456")
+                .country("India")
+                .fullName("Some user")
+                .user(user)
+                .build();
+        Book book = Book.builder()
+                .id(5L)
+                .name("Some book")
+                .isbn("Isbn")
+                .isbn13("isbn13")
+                .amount(456D)
+                .build();
+        return Order.builder()
+                .id(id)
+                .user(user)
+                .shippingAddress(address)
+                .quantity(5)
+                .bookToPurchase(book)
                 .build();
     }
 }

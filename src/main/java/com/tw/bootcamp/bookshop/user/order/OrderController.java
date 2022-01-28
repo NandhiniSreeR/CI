@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class OrderController {
@@ -66,8 +67,11 @@ public class OrderController {
             schema = @Schema(implementation = AdminOrderResponse.class))})}
     )
     public ResponseEntity<List<AdminOrderResponse>> findAllOrders() {
-        List<AdminOrderResponse> orders = orderService.findAllOrdersForAdmin();
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+        List<Order> orders = orderService.findAllOrdersForAdmin();
+        List<AdminOrderResponse> adminOrderResponses = orders.stream()
+                .map(Order::toAdminOrderResponse)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(adminOrderResponses, HttpStatus.OK);
     }
 
 }

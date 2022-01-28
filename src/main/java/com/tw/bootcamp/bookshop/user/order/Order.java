@@ -84,4 +84,18 @@ public class Order {
         return getClass().hashCode();
     }
 
+    public AdminOrderResponse toAdminOrderResponse() {
+        return AdminOrderResponse.builder()
+                .orderNumber(id)
+                .orderDate(orderDate)
+                .customerName(user.getEmail())
+                .phoneNumber(shippingAddress.getMobileNumber())
+                .bookName(bookToPurchase.getName())
+                .bookIsbn(bookToPurchase.getIsbn())
+                .bookIsbn13(bookToPurchase.getIsbn13())
+                .totalCost(bookToPurchase.getAmount() * quantity)
+                .noOfCopies(quantity)
+                .address(shippingAddress.toResponse())
+                .build();
+    }
 }

@@ -57,7 +57,7 @@ public class OrderService {
                 .orElseThrow(AddressNotFoundForCustomerException::new);
     }
 
-    public List<AdminOrderResponse> findAllOrdersForAdmin() {
+    public List<Order> findAllOrdersForAdmin() {
         return Collections.emptyList();
     }
 }
