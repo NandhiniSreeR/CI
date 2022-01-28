@@ -3,6 +3,8 @@ package com.tw.bootcamp.bookshop.user.order;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tw.bootcamp.bookshop.book.BookService;
 import com.tw.bootcamp.bookshop.book.BookTestBuilder;
+import com.tw.bootcamp.bookshop.user.Role;
+import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserService;
 import com.tw.bootcamp.bookshop.user.UserTestBuilder;
 import com.tw.bootcamp.bookshop.user.address.AddressService;
@@ -17,8 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
+import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -72,6 +76,32 @@ class OrderControllerTest {
                 .paymentMode(PaymentMode.CASH_ON_DELIVERY)
                 .addressId(3L)
                 .bookId(1L)
+                .build();
+    }
+
+    @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    void shouldReturnListOfAllPlacedOrders() throws Exception {
+
+        User adminUser = new UserTestBuilder().build();
+        adminUser.setRole(Role.ADMIN);
+        userService.updateRole(adminUser);
+
+        AdminOrderResponse firstOrder = createAdminOrderResponse(111L);
+        AdminOrderResponse secondOrder = createAdminOrderResponse(222L);
+
+        when(orderService.findAllOrdersForAdmin()).thenReturn(asList(firstOrder, secondOrder));
+
+        mockMvc.perform(get("/admin/orders"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].orderNumber").value(firstOrder.getOrderNumber()))
+                .andExpect(jsonPath("$[1].orderNumber").value(secondOrder.getOrderNumber()));
+    }
+
+    private AdminOrderResponse createAdminOrderResponse(Long orderNumber) {
+        return AdminOrderResponse
+                .builder()
+                .orderNumber(orderNumber)
                 .build();
     }
 }

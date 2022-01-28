@@ -1,8 +1,8 @@
 package com.tw.bootcamp.bookshop.user.order;
 
 import com.tw.bootcamp.bookshop.book.Book;
-import com.tw.bootcamp.bookshop.book.error.BookNotFoundException;
 import com.tw.bootcamp.bookshop.book.BookService;
+import com.tw.bootcamp.bookshop.book.error.BookNotFoundException;
 import com.tw.bootcamp.bookshop.book.error.RequiredBookQuantityNotAvailableException;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserService;
@@ -20,15 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
-@RequestMapping("/orders")
 public class OrderController {
     @Autowired
     private OrderService orderService;
@@ -39,7 +39,7 @@ public class OrderController {
     @Autowired
     private BookService bookService;
 
-    @PostMapping
+    @PostMapping("/orders")
     @Operation(summary = "Create a new order for the logged in user",
             description = "Creates an order for user with details such as book details, payment mode, user address and quantity",
             tags = {"Order Service"})
@@ -56,4 +56,18 @@ public class OrderController {
         OrderResponse orderResponse = order.toResponse();
         return new ResponseEntity<>(orderResponse, HttpStatus.CREATED);
     }
+
+    @GetMapping("/admin/orders")
+    @Operation(summary = "Gets list of all placed orders for Admin only",
+            description = "List all orders in the system, restricted to admin role only",
+            tags = {"Order Service"})
+    @ApiResponses(value = {@ApiResponse(responseCode = "200",
+            description = "Orders returned", content = {@Content(mediaType = "application/json",
+            schema = @Schema(implementation = AdminOrderResponse.class))})}
+    )
+    public ResponseEntity<List<AdminOrderResponse>> findAllOrders() {
+        List<AdminOrderResponse> orders = orderService.findAllOrdersForAdmin();
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
 }
