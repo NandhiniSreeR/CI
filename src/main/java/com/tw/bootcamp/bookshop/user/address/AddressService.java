@@ -18,15 +18,9 @@ public class AddressService {
     @Autowired
     private AddressRepository addressRepository;
 
-
-    public static final String ADDRESS_CITY_COUNTRY_STATE_REGEX = "[A-Za-z]+";
-    public static final String ADDRESS_PINCODE_REGEX = "^[A-Za-z0-9]*";
-    public static final String ADDRESS_MOBILE_NUMBER_REGEX = "[\\d]{10}";
-
-
     public Address create(@Valid CreateAddressRequest createRequest, User user) {
         createRequest.validate();
-        if(Objects.nonNull(user)) {
+        if (Objects.nonNull(user)) {
             List<Address> addresses = addressRepository.findAddressesByUserId(user.getId());
             if (addresses.isEmpty()) {
                 createRequest.setDefault(true);

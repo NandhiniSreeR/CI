@@ -20,6 +20,9 @@ public class CreateAddressRequest {
             = "Invalid Characters in this Field.Accepts only Alphabets and Numbers";
     private static final String INVALID_CHARACTERS_IN_THIS_FIELD_ACCEPTS_ONLY_NUMBERS = "Invalid Mobile Number.Accepts only 10 digit Numbers";
 
+    private static final String ADDRESS_CITY_COUNTRY_STATE_REGEX = "[A-Za-z]+";
+    private static final String ADDRESS_PINCODE_REGEX = "^[A-Za-z0-9]*";
+    private static final String ADDRESS_MOBILE_NUMBER_REGEX = "[\\d]{10}";
 
     @Schema(example = "Jane Doe", description = "Name of the customer")
     private String fullName;
@@ -50,21 +53,21 @@ public class CreateAddressRequest {
 
     public void validate() {
         AddressErrorResponse addressErrorResponse = new AddressErrorResponse("Failed to save address as some of the fields are invalid");
-        if (getCity() != null && !Pattern.matches(AddressService.ADDRESS_CITY_COUNTRY_STATE_REGEX, getCity())) {
+        if (getCity() != null && !Pattern.matches(ADDRESS_CITY_COUNTRY_STATE_REGEX, getCity())) {
             addressErrorResponse.addError("city", INVALID_CHARACTERS_IN_THIS_FIELD_ACCEPTS_ONLY_ALPHABETS);
         }
-        if (getCountry() != null && !Pattern.matches(AddressService.ADDRESS_CITY_COUNTRY_STATE_REGEX, getCountry())) {
+        if (getCountry() != null && !Pattern.matches(ADDRESS_CITY_COUNTRY_STATE_REGEX, getCountry())) {
             addressErrorResponse.addError("country", INVALID_CHARACTERS_IN_THIS_FIELD_ACCEPTS_ONLY_ALPHABETS);
         }
-        if (getState() != null && !Pattern.matches(AddressService.ADDRESS_CITY_COUNTRY_STATE_REGEX, getState())) {
+        if (getState() != null && !Pattern.matches(ADDRESS_CITY_COUNTRY_STATE_REGEX, getState())) {
             addressErrorResponse.addError("state", INVALID_CHARACTERS_IN_THIS_FIELD_ACCEPTS_ONLY_ALPHABETS);
         }
-        if (getPinCode() != null && !Pattern.matches(AddressService.ADDRESS_PINCODE_REGEX, getPinCode())) {
+        if (getPinCode() != null && !Pattern.matches(ADDRESS_PINCODE_REGEX, getPinCode())) {
             addressErrorResponse.addError("pincode", INVALID_CHARACTERS_IN_THIS_FIELD_ACCEPTS_ONLY_ALPHABETS_AND_NUMBERS);
         }
         if (getMobileNumber() != null) {
             String mobileNumber = String.valueOf(getMobileNumber());
-            if (mobileNumber.length() > 10 || !Pattern.matches(AddressService.ADDRESS_MOBILE_NUMBER_REGEX, mobileNumber)) {
+            if (mobileNumber.length() > 10 || !Pattern.matches(ADDRESS_MOBILE_NUMBER_REGEX, mobileNumber)) {
                 addressErrorResponse.addError("mobileNumber", INVALID_CHARACTERS_IN_THIS_FIELD_ACCEPTS_ONLY_NUMBERS);
             }
         }
