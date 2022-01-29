@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,7 +52,7 @@ public class OrderController {
             description = "Order created", content = {@Content(mediaType = "application/json",
             schema = @Schema(implementation = OrderResponse.class))})}
     )
-    public ResponseEntity<OrderResponse> create(@RequestBody CreateOrderRequest createRequest, Principal principal) throws BookNotFoundException, RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException, InvalidPaymentModeException {
+    public ResponseEntity<OrderResponse> create(@Valid @RequestBody CreateOrderRequest createRequest, Principal principal) throws BookNotFoundException, RequiredBookQuantityNotAvailableException, OrderQuantityCannotBeLessThanOneException, AddressNotFoundForCustomerException, InvalidPaymentModeException {
         User user = userService.findByEmail(principal.getName()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         Address address = addressService.loadAddressById(createRequest.getAddressId()).orElseThrow(() -> new AddressNotFoundForCustomerException());
         Book book = bookService.fetchByBookId(createRequest.getBookId());

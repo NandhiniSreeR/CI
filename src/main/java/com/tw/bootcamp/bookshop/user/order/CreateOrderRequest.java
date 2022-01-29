@@ -3,7 +3,7 @@ package com.tw.bootcamp.bookshop.user.order;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
 @Builder
@@ -11,16 +11,16 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode
 @NoArgsConstructor
 public class CreateOrderRequest {
-    @NotBlank
+    @NotNull
     @Schema(example = "1", description = "Order Quantity")
     private int quantity;
-    @NotBlank
+    @NotNull
     @Schema(example = "CREDIT_CARD", description = "Mode of Payment")
     private PaymentMode paymentMode;
-    @NotBlank
+    @NotNull
     @Schema(example = "1", description = "Unique Identifier of the Address")
     private Long addressId;
-    @NotBlank
+    @NotNull
     @Schema(example = "1", description = "Unique Identifier of the Book")
     private Long bookId;
 }
