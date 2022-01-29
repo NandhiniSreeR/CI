@@ -1,6 +1,7 @@
 package com.tw.bootcamp.bookshop.user.address;
 
 import com.tw.bootcamp.bookshop.error.AddressErrorResponse;
+import com.tw.bootcamp.bookshop.error.AddressNotValidException;
 import com.tw.bootcamp.bookshop.user.User;
 import com.tw.bootcamp.bookshop.user.UserRepository;
 import com.tw.bootcamp.bookshop.user.UserTestBuilder;
@@ -71,66 +72,52 @@ class AddressServiceTest {
     void shouldReturnErrorResponseWhenInvalidCityInInput() {
         User user = userRepository.save(new UserTestBuilder().build());
         CreateAddressRequest createRequest = addressWithInvalidCity();
-
-        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
-
-        assertTrue(errorResponses.hasAnyErrors());
+        assertThrows(AddressNotValidException.class, createRequest::validate);
     }
 
     @Test
     void shouldReturnTrueWhenAddressIsValid() {
         CreateAddressRequest createRequest = createAddress();
 
-        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+        assertDoesNotThrow(createRequest::validate);
 
-        assertFalse(errorResponses.hasAnyErrors());
     }
 
     @Test
     void shouldReturnErrorResponseWhenInvalidCountryInInput() {
         CreateAddressRequest createRequest = addressWithInvalidCountry();
 
-        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
-
-        assertTrue(errorResponses.hasAnyErrors());
+        assertThrows(AddressNotValidException.class, createRequest::validate);
     }
 
     @Test
     void shouldReturnErrorResponseWhenCountryContainsAlphanumericInInput() {
         CreateAddressRequest createRequest = addressWithInvalidAlphanumericCountry();
 
-        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+        assertThrows(AddressNotValidException.class, createRequest::validate);
 
-        assertTrue(errorResponses.hasAnyErrors());
     }
 
     @Test
     void shouldReturnErrorResponseWhenInvalidCountryAndInvalidCityAndInvalidStateInInput() {
         CreateAddressRequest createRequest = addressWithInvalidCountryAndInvalidCityAndInvalidState();
 
-        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
+        AddressNotValidException addressNotValidException = assertThrows(AddressNotValidException.class, createRequest::validate);
 
-        assertTrue(errorResponses.hasAnyErrors());
-        assertEquals(3,errorResponses.countOfErrors());
+        assertEquals(3,addressNotValidException.addressErrorResponse.countOfErrors());
 
     }
 
     @Test
     void shouldReturnErrorResponseWhenInvalidPincodeInInput() {
         CreateAddressRequest createRequest = addressWithInvalidPincode();
-
-        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
-
-        assertTrue(errorResponses.hasAnyErrors());
+        assertThrows(AddressNotValidException.class, createRequest::validate);
     }
 
     @Test
     void shouldReturnErrorResponseWhenInvalidMobileNumberInInput() {
         CreateAddressRequest createRequest = addressWithInvalidMobileNumber();
-
-        AddressErrorResponse errorResponses =  addressService.validate(createRequest);
-
-        assertTrue(errorResponses.hasAnyErrors());
+        assertThrows(AddressNotValidException.class, createRequest::validate);
     }
 
 
