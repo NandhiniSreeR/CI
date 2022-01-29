@@ -166,13 +166,21 @@ class OrderControllerTest {
         Order secondOrder = createOrder(222L);
         String endDateStr = "2020-08-10";
         Date endDate = dateFormat.parse(endDateStr);
-        when(orderService.findAllOrdersForAdmin(Optional.empty(), Optional.of(endDate))).thenReturn(Collections.singletonList(secondOrder));
+        when(orderService.findAllOrdersForAdmin(Optional.empty(), Optional.of(endDate)))
+                .thenReturn(Collections.singletonList(secondOrder));
 
         mockMvc.perform(get("/admin/orders?endDate="+endDateStr))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].orderNumber").value(secondOrder.getId()));
 
         verify(orderService).findAllOrdersForAdmin(Optional.empty(), Optional.of(endDate));
+    }
+
+    @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
+    void shouldThrowErrorWhenInvokedWithInvalidDateFormat() throws Exception {
+        mockMvc.perform(get("/admin/orders?startDate=10-08-2020"))
+                .andExpect(status().isNotAcceptable());
     }
 
     private Order createOrder(Long id) {
