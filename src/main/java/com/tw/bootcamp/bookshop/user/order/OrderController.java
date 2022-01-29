@@ -84,6 +84,7 @@ public class OrderController {
     }
 
     private Optional<Date> parse(Optional<String> maybeDate) {
+        dateFormat.setLenient(false);
         try {
             return maybeDate.isPresent() ? Optional.of(dateFormat.parse(maybeDate.get())) : Optional.empty();
         } catch (ParseException e) {
